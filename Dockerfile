@@ -5,7 +5,7 @@ RUN swift build -c release
 # aarch64-unknown-linux-gnu for raspberry pi
 # x86_64-unknown-linux-gnu for intel based architectures
 RUN mkdir output
-RUN cp -R $(swift build --show-bin-path -c release) output/
+RUN cp -R $(swift build --show-bin-path -c release)/* output/
 RUN strip -s output/FoodBlog
 
 FROM swift:6.0-slim
