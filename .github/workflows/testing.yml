@@ -1,0 +1,9 @@
+name: testing-workflow
+run-name: Unit tests with Swift 6 started by ${{ github.actor }}
+on: [push]
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker run --rm -v "$PWD:/code" -w /code swift:6.0.0 swift test
