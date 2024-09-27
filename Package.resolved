@@ -1,0 +1,33 @@
+{
+  "originHash" : "9b589fb5cef12c106c74be28b00c763e2a2c8f0092d2257e0491f11ff733c653",
+  "pins" : [
+    {
+      "identity" : "bootstrapstarter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/BootstrapStarter",
+      "state" : {
+        "revision" : "8ce2045226527cda984b05ce25077edc0ff36e9a",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/swifter",
+      "state" : {
+        "revision" : "31944055c4ae399ac1e7f88c756d7b19277f2bcb",
+        "version" : "2.0.4"
+      }
+    },
+    {
+      "identity" : "template.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomieq/Template.swift.git",
+      "state" : {
+        "revision" : "27fa5124121e70c9b604969e4f0eb1afc3ee6066",
+        "version" : "1.5.1"
+      }
+    }
+  ],
+  "version" : 3
+}
