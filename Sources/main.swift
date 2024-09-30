@@ -20,13 +20,13 @@ do {
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
         
-        let picsPath = FileManager.default.currentDirectoryPath + "/volume/pics/"
-        let thumbsPath = FileManager.default.currentDirectoryPath + "/volume/thumbs/"
+        let picsPath = Volume.path + "pics/"
+        let thumbsPath = Volume.path + "thumbs/"
+        try FileManager.default.createDirectory(atPath: picsPath, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(atPath: thumbsPath, withIntermediateDirectories: true)
         
         for multiPart in request.parseMultiPartFormData() {
             if let image = try? Image(data: Data(multiPart.body), as: .jpg) {
-                try FileManager.default.createDirectory(atPath: picsPath, withIntermediateDirectories: true)
-                try FileManager.default.createDirectory(atPath: thumbsPath, withIntermediateDirectories: true)
                 let name = UUID().uuidString + ".jpg"
                 let piclocation = URL(fileURLWithPath: picsPath + name)
                 let thumblocation = URL(fileURLWithPath: thumbsPath + name)
@@ -42,6 +42,9 @@ do {
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
         
+        for name in try FileManager.default.contentsOfDirectory(atPath: thumbsPath) {
+            adminTemplate.assign(["path": "thumbs/" + name], inNest: "pics")
+        }
         template.body = adminTemplate
         return .ok(.html(template))
     }
@@ -50,6 +53,8 @@ do {
         if let filePath = BootstrapTemplate.absolutePath(for: request.path) {
             try HttpFileResponse.with(absolutePath: filePath)
         }
+        try HttpFileResponse.with(absolutePath: Volume.path + request.path)
+
         let resourcePath = Resource().absolutePath(for: request.path)
         try HttpFileResponse.with(absolutePath: resourcePath)
         return .notFound()

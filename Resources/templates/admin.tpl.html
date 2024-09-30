@@ -13,7 +13,18 @@
   </header>
   <!-- end header section -->
 
-<b>Dodaj zdjęcia</b>
-{form}
+<div class="container">
+    <b>Dodaj zdjęcia</b>
+    {form}
 
-<b>Ostatnie zdjęcia</b>
+    <b>Ostatnie zdjęcia</b>
+      <div class="row">
+          [START pics]
+          <div class="col col-4 col-sm-4 col-md-4 col-lg-2">
+              <img src="{path}" class="img-thumbnail rounded" />
+          </div>
+          [END pics]
+      </div>
+</div>
+
+
