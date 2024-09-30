@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap");
 body {
   font-family: "Open Sans", sans-serif;
-  color: #0c0c0c;
-  background-color: #ffffff;
+  color: #ffffff;
+  background-color: #212831;
   overflow-x: hidden;
 }
 
@@ -31,7 +31,7 @@ body {
 }
 
 h1,
-h2 {
+h2, h3, h4 {
   font-family: 'Dancing Script', cursive;
 }
 
@@ -92,7 +92,7 @@ a:focus {
 /*header section*/
 .tmq_area {
   position: relative;
-  min-height: 100vh;
+  min-height: 80vh;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
