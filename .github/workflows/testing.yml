@@ -6,5 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: apt-get update -y && apt-get install -y libgd-dev
       - run: docker build -t tomieq/food_blog:1.0 .
       - run: docker run --rm -v "$PWD:/code" -w /code swift:6.0.0 swift test
