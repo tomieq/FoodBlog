@@ -7,5 +7,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t tomieq/food_blog:1.0 .
-      - run: docker run -p 80:80 tomieq/food_blog:1.0
       - run: docker run --rm -v "$PWD:/code" -w /code swift:6.0.0 swift test
