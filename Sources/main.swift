@@ -2,6 +2,7 @@ import Foundation
 import BootstrapTemplate
 import Template
 import Swifter
+import SwiftGD
 import Dispatch
 
 
@@ -19,10 +20,22 @@ do {
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
         
+        let picsPath = FileManager.default.currentDirectoryPath + "/volume/pics/"
+        let thumbsPath = FileManager.default.currentDirectoryPath + "/volume/thumbs/"
+        
         for multiPart in request.parseMultiPartFormData() {
-            if let fileName = multiPart.fileName {
-                let path = FileManager.default.currentDirectoryPath + "/volume/" + fileName
-                FileManager.default.createFile(atPath: path, contents: Data(multiPart.body), attributes: nil)
+            if let image = try? Image(data: Data(multiPart.body), as: .jpg) {
+                try FileManager.default.createDirectory(atPath: picsPath, withIntermediateDirectories: true)
+                try FileManager.default.createDirectory(atPath: thumbsPath, withIntermediateDirectories: true)
+                let name = UUID().uuidString + ".jpg"
+                let piclocation = URL(fileURLWithPath: picsPath + name)
+                let thumblocation = URL(fileURLWithPath: thumbsPath + name)
+                if image.size.width > 2048 {
+                    image.resizedTo(width: 2048)?.write(to: piclocation)
+                } else {
+                    image.write(to: piclocation)
+                }
+                image.resizedTo(width: 256)?.write(to: thumblocation)
             }
         }
 
