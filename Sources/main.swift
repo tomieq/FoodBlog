@@ -16,6 +16,13 @@ do {
         return .ok(.html(template))
     }
     server["/admin"] = { request, headers in
+        let digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { login in
+            switch login {
+            case "admin": "root"
+            default: nil
+            }
+        })
+        let login = try digest.authorizedUser(request)
         let template = BootstrapTemplate()
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
