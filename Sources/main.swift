@@ -7,6 +7,7 @@ import Dispatch
 
 
 do {
+    let db = try Database()
     let server = HttpServer()
     server["/"] = { request, headers in
         let template = BootstrapTemplate()

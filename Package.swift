@@ -9,7 +9,8 @@ let package = Package(
         .package(url: "https://github.com/tomieq/BootstrapStarter", from: "1.0.1"),
         .package(url: "https://github.com/tomieq/swifter", from: "2.0.4"),
         .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0"),
-        .package(url: "https://github.com/twostraws/SwiftGD", branch: "main")
+        .package(url: "https://github.com/twostraws/SwiftGD", branch: "main"),
+        .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.15.3")
     ],
     targets: [
         .executableTarget(
@@ -18,7 +19,8 @@ let package = Package(
                 .product(name: "BootstrapTemplate", package: "BootstrapStarter"),
                 .product(name: "Swifter", package: "Swifter"),
                 .product(name: "Template", package: "Template.swift"),
-                .product(name: "SwiftGD", package: "SwiftGD")
+                .product(name: "SwiftGD", package: "SwiftGD"),
+                .product(name: "SQLite", package: "SQLite.swift")
             ]),
         .testTarget(
             name: "FoodBlogTests",

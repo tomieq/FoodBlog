@@ -1,6 +1,6 @@
 FROM swift:6.0 as builder
 RUN apt-get update -y
-RUN apt-get install -y libgd-dev
+RUN apt-get install -y libgd-dev libsqlite3-dev
 WORKDIR /app
 COPY . .
 RUN swift build -c release
@@ -12,7 +12,7 @@ RUN strip -s output/FoodBlog
 
 FROM swift:6.0-slim
 RUN apt-get update -y
-RUN apt-get install -y libgd-dev
+RUN apt-get install -y libgd-dev libsqlite3-dev
 WORKDIR /app
 # first copy everything to temp directory
 COPY --from=builder /app/output/ ./tmp/
