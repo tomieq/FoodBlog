@@ -15,7 +15,11 @@ do {
         let template = BootstrapTemplate()
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
-        template.body = Template.load(relativePath: "templates/body.tpl.html")
+        let body = Template.load(relativePath: "templates/body.tpl.html")
+        for photo in try PhotoTable.unowned(db: db) {
+            body.assign(["path": "/pics/\(photo.filename)"], inNest: "pic")
+        }
+        template.body = body
         return .ok(.html(template))
     }
     server["/admin"] = { request, headers in
