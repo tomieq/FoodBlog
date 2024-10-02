@@ -1,13 +1,15 @@
 import Foundation
+import SQLite
 import BootstrapTemplate
 import Template
 import Swifter
-import SwiftGD
 import Dispatch
 
 
 do {
-    let db = try Database()
+    print("Open \(Volume.path + "storage.db")")
+    let db = try Connection(Volume.path + "storage.db")
+    let photoManager = try PhotoManager(db: db)
     let server = HttpServer()
     server["/"] = { request, headers in
         let template = BootstrapTemplate()
@@ -28,30 +30,15 @@ do {
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
         
-        let picsPath = Volume.path + "pics/"
-        let thumbsPath = Volume.path + "thumbs/"
-        try FileManager.default.createDirectory(atPath: picsPath, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(atPath: thumbsPath, withIntermediateDirectories: true)
-        
-        for multiPart in request.parseMultiPartFormData() {
-            if let image = try? Image(data: Data(multiPart.body), as: .jpg) {
-                let name = UUID().uuidString + ".jpg"
-                let piclocation = URL(fileURLWithPath: picsPath + name)
-                let thumblocation = URL(fileURLWithPath: thumbsPath + name)
-                if image.size.width > 2048 {
-                    image.resizedTo(width: 2048)?.write(to: piclocation)
-                } else {
-                    image.write(to: piclocation)
-                }
-                image.resizedTo(width: 256)?.write(to: thumblocation)
-            }
+        for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
+            _ = try? photoManager.store(picture: Data(multiPart.body))
         }
 
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
         
-        for name in try FileManager.default.contentsOfDirectory(atPath: thumbsPath) {
-            adminTemplate.assign(["path": "thumbs/" + name], inNest: "pics")
+        for photo in try PhotoTable.unowned(db: db) {
+            adminTemplate.assign(["path": "thumbs/" + photo.filename], inNest: "pics")
         }
         template.body = adminTemplate
         return .ok(.html(template))

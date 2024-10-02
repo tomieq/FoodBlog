@@ -24,6 +24,11 @@ let package = Package(
             ]),
         .testTarget(
             name: "FoodBlogTests",
+            dependencies: [
+                "FoodBlog",
+                .product(name: "SwiftGD", package: "SwiftGD"),
+                .product(name: "SQLite", package: "SQLite.swift")
+            ],
             path: "Tests")
     ]
 )
