@@ -10,6 +10,8 @@ do {
     print("Open \(Volume.path + "storage.db")")
     let db = try Connection(Volume.path + "storage.db")
     let photoManager = try PhotoManager(db: db)
+    let postManager = try PostManager(db: db)
+
     let server = HttpServer()
     server["/"] = { request, headers in
         let template = BootstrapTemplate()
@@ -37,13 +39,21 @@ do {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             _ = try? photoManager.store(picture: Data(multiPart.body))
         }
+        // delete image
         if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
             try photoManager.remove(photoID: id)
         }
+        // flip image
         if let flipID = request.queryParams.get("flip"), let id = Int64(flipID),
            let direction = request.queryParams.get("direction"), let flipDirection = FlipDirection(rawValue: direction) {
             try photoManager.flip(photoID: id, direction: flipDirection)
             return .movedTemporarily("/admin")
+        }
+        // add post
+        if let title = request.formData.get("title"), let text = request.formData.get("text"),
+           let ids = request.formData.get("pictureIDs") {
+            let photoIDs = ids.components(separatedBy: ",").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.compactMap { Int64($0)}
+            _ = try postManager.store(title: title, text: text, date: Date(), photoIDs: photoIDs)
         }
 
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
@@ -57,6 +67,14 @@ do {
                 "id": photo.id!
             ], inNest: "pics")
         }
+        
+        let postForm = Form(url: "/admin", method: "POST")
+        postForm.addInputText(name: "title", label: "Tytuł posta")
+        postForm.addTextarea(name: "text", label: "Treść", rows: 10)
+        postForm.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami")
+        postForm.addSubmit(name: "add", label: "Opublikuj", style: .success)
+        adminTemplate["postForm"] = postForm
+        
         template.body = adminTemplate
         return .ok(.html(template))
     }

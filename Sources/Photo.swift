@@ -6,10 +6,16 @@
 //
 import Foundation
 
-struct Photo: Codable {
-    let id: Int64?
-    let postID: Int64
+class Photo: Codable {
+    var id: Int64?
+    var postID: Int64
     let filename: String
+    
+    init(id: Int64? = nil, postID: Int64, filename: String) {
+        self.id = id
+        self.postID = postID
+        self.filename = filename
+    }
 }
 
 extension Photo {

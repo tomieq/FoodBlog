@@ -23,28 +23,24 @@ extension PhotoTable {
         try db.run(table.createIndex(postID, ifNotExists: true))
     }
     
-    static func store(db: Connection, _ photo: Photo) throws -> Photo{
+    static func store(db: Connection, _ photo: Photo) throws {
         if let rowID = photo.id {
             try db.run(table.filter(id == rowID).update(
                 postID <- photo.postID,
                 filename <- photo.filename
             ))
             print("Updated \(photo.json)")
-            return photo
         } else {
             let id = try db.run(table.insert(
                 postID <- photo.postID,
                 filename <- photo.filename
             ))
-            let photo = Photo(id: id,
-                              postID: photo.postID,
-                              filename: photo.filename)
+            photo.id = id
             print("Inserted \(photo.json)")
-            return photo
         }
     }
     
-    static func photos(db: Connection, postID: Int64) throws -> [Photo] {
+    static func get(db: Connection, postID: Int64) throws -> [Photo] {
         var result: [Photo] = []
         for row in try db.prepare(table.filter(Self.postID == postID)) {
             result.append(Photo(id: row[id],
@@ -54,7 +50,7 @@ extension PhotoTable {
         return result
     }
     
-    static func photo(db: Connection, id: Int64) throws -> Photo? {
+    static func get(db: Connection, id: Int64) throws -> Photo? {
         if let row = try db.pluck(table.filter(Self.id == id)) {
             return Photo(id: row[Self.id],
                          postID: row[Self.postID],
@@ -63,8 +59,18 @@ extension PhotoTable {
         return nil
     }
     
+    static func get(db: Connection, ids: [Int64]) throws -> [Photo] {
+        var result: [Photo] = []
+        for row in try db.prepare(table.filter(ids.contains(id))) {
+            result.append(Photo(id: row[id],
+                                postID: row[Self.postID],
+                                filename: row[filename]))
+        }
+        return result
+    }
+    
     static func unowned(db: Connection) throws -> [Photo] {
-        try photos(db: db, postID: 0)
+        try get(db: db, postID: 0)
     }
     
     static func remove(db: Connection, id: Int64) throws {

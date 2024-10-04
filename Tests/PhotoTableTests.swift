@@ -21,7 +21,7 @@ struct PhotoTableTests {
                                  Photo(id: nil,
                                        postID: 71,
                                        filename: "temp3.jpg"))
-        let saved = try PhotoTable.photos(db: connection, postID: 70)
+        let saved = try PhotoTable.get(db: connection, postID: 70)
         #expect(saved.count == 1)
         #expect(saved.first?.filename == "temp.jpg")
         #expect(saved.first?.postID == 70)
@@ -30,15 +30,15 @@ struct PhotoTableTests {
     @Test func update() async throws {
         let connection = try Connection(.inMemory)
         try PhotoTable.create(db: connection)
-        let photo = try PhotoTable.store(db: connection,
-                                         Photo(id: nil,
-                                               postID: 70,
-                                               filename: "temp.jpg"))
+        let photo = Photo(id: nil,
+                          postID: 70,
+                          filename: "temp.jpg")
+        try PhotoTable.store(db: connection, photo)
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: photo.id,
                                        postID: 70,
                                        filename: "temp3.jpg"))
-        let saved = try PhotoTable.photos(db: connection, postID: 70)
+        let saved = try PhotoTable.get(db: connection, postID: 70)
         #expect(saved.count == 1)
         #expect(saved.first?.filename == "temp3.jpg")
         #expect(saved.first?.postID == 70)
@@ -47,14 +47,27 @@ struct PhotoTableTests {
     @Test func get() async throws {
         let connection = try Connection(.inMemory)
         try PhotoTable.create(db: connection)
-        let photo = try PhotoTable.store(db: connection,
-                                         Photo(id: nil,
-                                               postID: 70,
-                                               filename: "temp.jpg"))
+        let photo = Photo(id: nil,
+                          postID: 70,
+                          filename: "temp.jpg")
+        try PhotoTable.store(db: connection, photo)
 
-        let saved = try PhotoTable.photo(db: connection, id: photo.id!)
+        let saved = try PhotoTable.get(db: connection, id: photo.id!)
         #expect(saved?.filename == "temp.jpg")
         #expect(saved?.postID == 70)
+    }
+    
+    @Test func getByIDs() async throws {
+        let connection = try Connection(.inMemory)
+        try PhotoTable.create(db: connection)
+        let photo = Photo(id: nil,
+                          postID: 70,
+                          filename: "temp.jpg")
+        try PhotoTable.store(db: connection, photo)
+        try PhotoTable.store(db: connection, photo)
+
+        let saved = try PhotoTable.get(db: connection, ids: [1, 2])
+        #expect(saved.count == 1)
     }
 
     @Test func remove() async throws {

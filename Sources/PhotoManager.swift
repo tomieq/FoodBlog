@@ -22,7 +22,7 @@ enum FlipDirection: String {
     }
 }
 
-class PhotoManager {
+struct PhotoManager {
     let db: Connection
 
     init(db: Connection) throws {
@@ -35,10 +35,10 @@ class PhotoManager {
     func store(picture: Data) throws -> Photo {
         let image = try Image(data: picture, as: .jpg)
         let name = (UUID().uuidString + ".jpg").lowercased().replacingOccurrences(of: "-", with: "")
-        let photo = try PhotoTable.store(db: db,
-                                         Photo(id: nil,
-                                               postID: 0,
-                                               filename: name))
+        let photo = Photo(id: nil,
+                          postID: 0,
+                          filename: name)
+        try PhotoTable.store(db: db, photo)
 
         if image.size.width > 2048 {
             try image.resizedTo(width: 2048)?.export(as: .jpg(quality: 80)).write(to: photo.piclocation)
@@ -53,7 +53,7 @@ class PhotoManager {
     }
     
     func remove(photoID: Int64) throws {
-        guard let photo = try PhotoTable.photo(db: db, id: photoID) else {
+        guard let photo = try PhotoTable.get(db: db, id: photoID) else {
             return
         }
         try PhotoTable.remove(db: db, id: photoID)
@@ -62,7 +62,7 @@ class PhotoManager {
     }
     
     func flip(photoID: Int64, direction: FlipDirection) throws {
-        guard let photo = try PhotoTable.photo(db: db, id: photoID) else {
+        guard let photo = try PhotoTable.get(db: db, id: photoID) else {
             return
         }
         [photo.thumblocation, photo.piclocation].forEach { url in
