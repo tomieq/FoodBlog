@@ -1,8 +1,9 @@
 <form method="POST" enctype='multipart/form-data' action="/admin"  accept-charset='utf-8'>
+    <p>
+        <input type="file" multiple name="media_file" accept="image/*, video/*" />
+    </p>
    
-<input type="file" multiple name="media_file" accept="image/*, video/*" />
-   
-   <div class="mb-3">
+   <div class="m-3">
      <button type="submit" name="process" value="process" class="btn btn-primary">Upload</button>
    </div>
 

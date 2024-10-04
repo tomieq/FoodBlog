@@ -49,7 +49,9 @@ do {
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
         
-        for photo in try PhotoTable.unowned(db: db) {
+        let photos = try PhotoTable.unowned(db: db)
+        adminTemplate["amount"] = photos.count
+        for photo in photos {
             adminTemplate.assign([
                 "path": "thumbs/" + photo.filename,
                 "id": photo.id!
