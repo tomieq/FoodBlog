@@ -37,4 +37,13 @@ class PhotoManager {
         print("Saved new file to \(photo.thumblocation)")
         return photo
     }
+    
+    func remove(photoID: Int64) throws {
+        guard let photo = try PhotoTable.photo(db: db, id: photoID) else {
+            return
+        }
+        try PhotoTable.remove(db: db, id: photoID)
+        try FileManager.default.removeItem(at: photo.piclocation)
+        try FileManager.default.removeItem(at: photo.thumblocation)
+    }
 }

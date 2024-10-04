@@ -29,7 +29,7 @@ do {
             default: nil
             }
         })
-        let login = try digest.authorizedUser(request)
+        _ = try digest.authorizedUser(request)
         let template = BootstrapTemplate()
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
@@ -37,12 +37,18 @@ do {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             _ = try? photoManager.store(picture: Data(multiPart.body))
         }
+        if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
+            try photoManager.remove(photoID: id)
+        }
 
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
         
         for photo in try PhotoTable.unowned(db: db) {
-            adminTemplate.assign(["path": "thumbs/" + photo.filename], inNest: "pics")
+            adminTemplate.assign([
+                "path": "thumbs/" + photo.filename,
+                "id": photo.id!
+            ], inNest: "pics")
         }
         template.body = adminTemplate
         return .ok(.html(template))

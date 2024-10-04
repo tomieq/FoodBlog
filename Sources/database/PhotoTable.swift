@@ -54,7 +54,20 @@ extension PhotoTable {
         return result
     }
     
+    static func photo(db: Connection, id: Int64) throws -> Photo? {
+        if let row = try db.pluck(table.filter(Self.id == id)) {
+            return Photo(id: row[Self.id],
+                         postID: row[Self.postID],
+                         filename: row[Self.filename])
+        }
+        return nil
+    }
+    
     static func unowned(db: Connection) throws -> [Photo] {
         try photos(db: db, postID: 0)
+    }
+    
+    static func remove(db: Connection, id: Int64) throws {
+        try db.run(table.filter(Self.id == id).delete())
     }
 }
