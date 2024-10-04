@@ -8,6 +8,20 @@ import Foundation
 import SQLite
 import SwiftGD
 
+enum FlipDirection: String {
+    case horizontal
+    case vertical
+    
+    var gdDirection: Image.FlipMode {
+        switch self {
+        case .horizontal:
+            .horizontal
+        case .vertical:
+            .vertical
+        }
+    }
+}
+
 class PhotoManager {
     let db: Connection
 
@@ -45,5 +59,18 @@ class PhotoManager {
         try PhotoTable.remove(db: db, id: photoID)
         try FileManager.default.removeItem(at: photo.piclocation)
         try FileManager.default.removeItem(at: photo.thumblocation)
+    }
+    
+    func flip(photoID: Int64, direction: FlipDirection) throws {
+        guard let photo = try PhotoTable.photo(db: db, id: photoID) else {
+            return
+        }
+        [photo.thumblocation, photo.piclocation].forEach { url in
+            if let image = Image(url: url) {
+                image.flip(direction.gdDirection)
+                image.write(to: url, allowOverwrite: true)
+            }
+        }
+        print("Flipped image id: \(photoID) \(direction)")
     }
 }

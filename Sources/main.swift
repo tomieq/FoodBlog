@@ -40,6 +40,11 @@ do {
         if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
             try photoManager.remove(photoID: id)
         }
+        if let flipID = request.queryParams.get("flip"), let id = Int64(flipID),
+           let direction = request.queryParams.get("direction"), let flipDirection = FlipDirection(rawValue: direction) {
+            try photoManager.flip(photoID: id, direction: flipDirection)
+            return .movedTemporarily("/admin")
+        }
 
         let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
