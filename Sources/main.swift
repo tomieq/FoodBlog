@@ -60,9 +60,12 @@ do {
         }
         // add post
         if let title = request.formData.get("title"), let text = request.formData.get("text"),
-           let ids = request.formData.get("pictureIDs") {
-            let photoIDs = ids.components(separatedBy: ",").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.compactMap { Int64($0)}
-            _ = try postManager.store(title: title, text: text, date: Date(), photoIDs: photoIDs)
+           let ids = request.formData.get("pictureIDs"), let dateString = request.formData.get("date"),
+           let date = Date.make(from: dateString) {
+            let photoIDs = ids.components(separatedBy: ",")
+                .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .compactMap { Int64($0)}
+            _ = try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
         }
 
         let adminTemplate = Template.cached(relativePath: "templates/admin.tpl.html")
@@ -81,9 +84,10 @@ do {
         postForm.addInputText(name: "title", label: "Tytuł posta")
         postForm.addTextarea(name: "text", label: "Treść", rows: 10)
         postForm.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami")
+        postForm.addInputText(name: "date", label: "Data", value: Date().readable)
         postForm.addSubmit(name: "add", label: "Opublikuj", style: .success)
         adminTemplate["postForm"] = postForm
-        
+        template.addJS(code: Template.cached(relativePath: "templates/datePicker.tpl.js").output)
         template.body = adminTemplate
         return .ok(.html(template))
     }

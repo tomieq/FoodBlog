@@ -60,7 +60,7 @@ extension PostTable {
     
     static func get(db: Connection) throws -> [Post] {
         var result: [Post] = []
-        for row in try db.prepare(table) {
+        for row in try db.prepare(table.order(Self.date.desc)) {
             result.append(Post(id: row[Self.id],
                                photos: [],
                                tags: [],
