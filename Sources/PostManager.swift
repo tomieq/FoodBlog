@@ -28,4 +28,12 @@ struct PostManager {
         }
         return post
     }
+    
+    func list() throws -> [Post] {
+        let posts = try PostTable.get(db: db)
+        try posts.forEach { post in
+            try post.photos = PhotoTable.get(db: db, postID: post.id!)
+        }
+        return posts
+    }
 }

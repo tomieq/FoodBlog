@@ -8,7 +8,7 @@ import Foundation
 
 class Post: Codable {
     var id: Int64?
-    let photos: [Photo]
+    var photos: [Photo]
     let tags: [Tag]
     let title: String
     let text: String

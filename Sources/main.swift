@@ -17,9 +17,18 @@ do {
         let template = BootstrapTemplate()
         template.title = "Jem na mieście"
         template.addCSS(url: "css/style.css")
-        let body = Template.load(relativePath: "templates/body.tpl.html")
-        for photo in try PhotoTable.unowned(db: db) {
-            body.assign(["path": "/pics/\(photo.filename)"], inNest: "pic")
+        let body = Template.cached(relativePath: "templates/body.tpl.html")
+        let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
+        
+        for post in try postManager.list() {
+            postTemplate.reset()
+            for photo in post.photos {
+                postTemplate.assign(["path": "/pics/\(photo.filename)"], inNest: "pic")
+            }
+            postTemplate["title"] = post.title
+            postTemplate["text"] = post.text
+            postTemplate["date"] = post.date.readable
+            body.assign(["content": postTemplate], inNest: "post")
         }
         template.body = body
         return .ok(.html(template))
@@ -56,7 +65,7 @@ do {
             _ = try postManager.store(title: title, text: text, date: Date(), photoIDs: photoIDs)
         }
 
-        let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
+        let adminTemplate = Template.cached(relativePath: "templates/admin.tpl.html")
         adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
         
         let photos = try PhotoTable.unowned(db: db)
