@@ -29,6 +29,21 @@ struct PostManager {
         return post
     }
     
+    func update(_ post: Post, title: String, text: String, date: Date, photoIDs: [Int64]) throws -> Post {
+        let updatedPost = Post(id: post.id,
+                               photos: try PhotoTable.get(db: db, ids: photoIDs),
+                               tags: [],
+                               title: title,
+                               text: text,
+                               date: date)
+        try PostTable.store(db: db, updatedPost)
+        for photo in updatedPost.photos {
+            photo.postID = post.id!
+            try PhotoTable.store(db: db, photo)
+        }
+        return updatedPost
+    }
+    
     func list() throws -> [Post] {
         let posts = try PostTable.get(db: db)
         try posts.forEach { post in

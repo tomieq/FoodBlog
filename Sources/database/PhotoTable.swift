@@ -69,6 +69,16 @@ extension PhotoTable {
         return result
     }
     
+    static func get(db: Connection, last: Int) throws -> [Photo] {
+        var result: [Photo] = []
+        for row in try db.prepare(table.order(id).limit(last)) {
+            result.append(Photo(id: row[id],
+                                postID: row[Self.postID],
+                                filename: row[filename]))
+        }
+        return result
+    }
+    
     static func unowned(db: Connection) throws -> [Photo] {
         try get(db: db, postID: 0)
     }

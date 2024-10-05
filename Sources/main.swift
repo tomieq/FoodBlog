@@ -41,9 +41,10 @@ do {
             }
         })
         _ = try digest.authorizedUser(request)
+        let moduleName = request.queryParams.get("module") ?? "posts"
         let template = BootstrapTemplate()
         template.title = "Jem na mieście"
-        template.addCSS(url: "css/style.css")
+        template.addCSS(url: "css/sb-admin-2.min.css")
         
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             _ = try? photoManager.store(picture: Data(multiPart.body))
@@ -51,12 +52,13 @@ do {
         // delete image
         if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
             try photoManager.remove(photoID: id)
+            //return .movedTemporarily("/admin?module=\(moduleName)")
         }
         // flip image
         if let flipID = request.queryParams.get("flip"), let id = Int64(flipID),
            let direction = request.queryParams.get("direction"), let flipDirection = FlipDirection(rawValue: direction) {
             try photoManager.flip(photoID: id, direction: flipDirection)
-            return .movedTemporarily("/admin")
+            //return .movedTemporarily("/admin?module=\(moduleName)")
         }
         // add post
         if let title = request.formData.get("title"), let text = request.formData.get("text"),
@@ -65,29 +67,81 @@ do {
             let photoIDs = ids.components(separatedBy: ",")
                 .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .compactMap { Int64($0)}
-            _ = try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
+            if let postID = request.formData.get("postID"), let id = Int64(postID), let post = try PostTable.get(db: db, id: id) {
+                _ = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs)
+            } else {
+                _ =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
+            }
         }
 
-        let adminTemplate = Template.cached(relativePath: "templates/admin.tpl.html")
-        adminTemplate["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
+        let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
         
-        let photos = try PhotoTable.unowned(db: db)
-        adminTemplate["amount"] = photos.count
-        for photo in photos {
-            adminTemplate.assign([
-                "path": "thumbs/" + photo.filename,
-                "id": photo.id!
-            ], inNest: "pics")
+        var module: Template!
+        switch moduleName {
+        case "posts":
+            module = Template.cached(relativePath: "templates/admin.posts.tpl.html")
+            for post in try PostTable.get(db: db) {
+                module.assign([
+                    "id": post.id!,
+                    "title": post.title
+                ], inNest: "post")
+            }
+        case "edit.post":
+            module = Template.cached(relativePath: "templates/admin.edit.post.tpl.html")
+            guard let post = try PostTable.get(db: db, id: request.queryParams.get("postID")?.int64 ?? 0) else {
+                return .movedTemporarily("/admin?module=posts")
+            }
+            let photos = try PhotoTable.get(db: db, postID: post.id!)
+            module["amount"] = photos.count
+            for photo in photos {
+                module.assign([
+                    "path": "thumbs/" + photo.filename,
+                    "id": photo.id!,
+                    "postID": post.id!
+                ], inNest: "pics")
+            }
+            let postForm = Form(url: "/admin", method: "POST")
+            postForm.addInputText(name: "title", label: "Tytuł posta", value: post.title)
+            postForm.addTextarea(name: "text", label: "Treść", value: post.text, rows: 10)
+            postForm.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
+            postForm.addInputText(name: "date", label: "Data", value: post.date.readable)
+            postForm.addHidden(name: "postID", value: post.id!)
+            postForm.addSubmit(name: "add", label: "Opublikuj", style: .success)
+            module["form"] = postForm
+        case "add.post":
+            module = Template.cached(relativePath: "templates/admin.add.post.tpl.html")
+            let photos = try PhotoTable.unowned(db: db)
+            module["amount"] = photos.count
+            for photo in photos {
+                module.assign([
+                    "path": "thumbs/" + photo.filename,
+                    "id": photo.id!
+                ], inNest: "pics")
+            }
+            let postForm = Form(url: "/admin", method: "POST")
+            postForm.addInputText(name: "title", label: "Tytuł posta")
+            postForm.addTextarea(name: "text", label: "Treść", rows: 10)
+            postForm.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
+            postForm.addInputText(name: "date", label: "Data", value: Date().readable)
+            postForm.addSubmit(name: "add", label: "Opublikuj", style: .success)
+            module["form"] = postForm
+        default:
+            module = Template.cached(relativePath: "templates/admin.photos.tpl.html")
+            module["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
+            let photos = try PhotoTable.get(db: db, last: 12)
+            module["amount"] = photos.count
+            for photo in photos {
+                module.assign([
+                    "path": "thumbs/" + photo.filename,
+                    "id": photo.id!
+                ], inNest: "pics")
+            }
         }
+        adminTemplate["module"] = module
+
         
-        let postForm = Form(url: "/admin", method: "POST")
-        postForm.addInputText(name: "title", label: "Tytuł posta")
-        postForm.addTextarea(name: "text", label: "Treść", rows: 10)
-        postForm.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami")
-        postForm.addInputText(name: "date", label: "Data", value: Date().readable)
-        postForm.addSubmit(name: "add", label: "Opublikuj", style: .success)
-        adminTemplate["postForm"] = postForm
-        template.addJS(code: Template.cached(relativePath: "templates/datePicker.tpl.js").output)
+
+        template.addJS(code: Template.cached(relativePath: "templates/datePicker.tpl.js"))
         template.body = adminTemplate
         return .ok(.html(template))
     }
