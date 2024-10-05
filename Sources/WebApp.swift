@@ -120,8 +120,10 @@ class WebApp {
             }
             return nil
         })
+    }
+    
+    func start() throws {
         try server.start(8080)
-        
     }
     
     private func assignThumbnails(_ photos: [Photo], _ module: Template, postID: Int64) {
