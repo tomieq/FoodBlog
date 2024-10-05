@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "FoodBlog",
     dependencies: [
-        .package(url: "https://github.com/tomieq/BootstrapStarter", from: "1.0.1"),
+        .package(url: "https://github.com/tomieq/BootstrapStarter", revision: "6c58c3d"),
         .package(url: "https://github.com/tomieq/swifter", from: "2.0.4"),
         .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0"),
         .package(url: "https://github.com/twostraws/SwiftGD", branch: "main"),
