@@ -40,6 +40,8 @@ class WebApp {
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
             template.addCSS(url: "css/style.css")
+            template.addCSS(url: "css/lightbox.min.css")
+            template.addJS(url: "js/lightbox.min.js")
             template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
             let body = Template.cached(relativePath: "templates/body.tpl.html")
             let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
@@ -52,6 +54,7 @@ class WebApp {
                 postTemplate["title"] = post.title
                 postTemplate["text"] = post.text
                 postTemplate["date"] = post.date.readable
+                postTemplate["postID"] = post.id
                 body.assign(["content": postTemplate], inNest: "post")
             }
             template.body = body
