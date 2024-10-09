@@ -44,6 +44,9 @@ class WebApp {
             template.body = body
             return .ok(.html(template))
         }
+        server["/index.html"] = { _, _ in
+            .movedPermanently("/")
+        }
         server["/admin"] = { [unowned self] request, headers in
             let digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { login in
                 switch login {
