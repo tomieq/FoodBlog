@@ -30,6 +30,20 @@ struct PostManagerTests {
         }
     }
     
+    @Test func pagination() async throws {
+        for i in 1...20 {
+            _ = try postManager.store(title: "Post \(i)", text: "Content \(i)", date: Date(), photoIDs: [])
+        }
+        let page0 = try postManager.list(limit: 5, page: 0)
+        #expect(page0.count == 5)
+        #expect(page0.map{ $0.title }.contains("Post 20"))
+        #expect(page0.map{ $0.title }.contains("Post 16"))
+        let page1 = try postManager.list(limit: 5, page: 1)
+        #expect(page1.count == 5)
+        #expect(page1.map{ $0.title }.contains("Post 15"))
+        #expect(page1.map{ $0.title }.contains("Post 11"))
+    }
+    
     func createPhoto() throws -> Photo {
         let photo = Photo(postID: 0, filename: UUID().uuidString + ".jpg")
         try PhotoTable.store(db: connection, photo)

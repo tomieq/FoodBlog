@@ -74,12 +74,13 @@ h2, h3, h4 {
 a,
 a:hover,
 a:focus {
-  text-decoration: none;
+  text-decoration: underline;
+  color: #ffffff;
 }
 
 a:hover,
 a:focus {
-  color: initial;
+  color: #c0c0c0;
 }
 
 .btn,

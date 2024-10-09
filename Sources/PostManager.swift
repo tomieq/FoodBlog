@@ -44,8 +44,8 @@ struct PostManager {
         return updatedPost
     }
     
-    func list() throws -> [Post] {
-        let posts = try PostTable.get(db: db)
+    func list(limit: Int, page: Int) throws -> [Post] {
+        let posts = try PostTable.get(db: db, limit: limit, offset: limit * page)
         try posts.forEach { post in
             try post.photos = PhotoTable.get(db: db, postID: post.id!)
         }

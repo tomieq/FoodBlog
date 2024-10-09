@@ -11,4 +11,7 @@ extension String {
     var int64: Int64? {
         Int64(self)
     }
+    var int: Int? {
+        Int(self)
+    }
 }

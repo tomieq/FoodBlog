@@ -2,13 +2,13 @@
 
   <div class="tmq_area">
     <div class="bg-box">
-      <img src="images/bg.jpg" alt="">
+      <img src="/images/bg.jpg" alt="">
     </div>
     <!-- header section strats -->
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="/">
             <span>
               Jem na mieście.pl
             </span>
@@ -40,6 +40,22 @@
         {content}
         <hr>
         [END post]
+        <div class="row">
+            <div class="col-6">
+        [START previous]
+            <p class="text-start">
+                <a href="{url}" class="btn btn-dark">« Nowsze relacje</a>
+            </p>
+        [END previous]
+            </div>
+            <div class="col-6">
+        [START next]
+            <p class="text-end">
+                <a href="{url}" class="btn btn-dark">Starsze relacje »</a>
+            </p>
+        [END next]
+            </div>
+        </div>
     </div>
 
   <!-- footer section -->
@@ -52,24 +68,20 @@
               Miejsce działania
             </h4>
             <div class="contact_link_box">
-              <a href="">
                 <i class="fa fa-map-marker" aria-hidden="true"></i>
                 <span>
                   Łódź i okolice
                 </span>
-              </a>
             </div>
           </div>
         </div>
         <div class="col-md-4 footer-col">
-          <div class="footer_detail">
-            <a href="" class="footer-logo">
-                O mnie
-            </a>
+          <h4>
+            O mnie
+          </h4>
             <p>
               Lokalny smakosz
             </p>
-          </div>
         </div>
         <div class="col-md-4 footer-col">
           <h4>

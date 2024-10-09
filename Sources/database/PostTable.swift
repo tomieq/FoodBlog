@@ -58,9 +58,9 @@ extension PostTable {
         return nil
     }
     
-    static func get(db: Connection) throws -> [Post] {
+    static func get(db: Connection, limit: Int, offset: Int) throws -> [Post] {
         var result: [Post] = []
-        for row in try db.prepare(table.order(Self.date.desc)) {
+        for row in try db.prepare(table.order(Self.date.desc).limit(limit, offset: offset)) {
             result.append(Post(id: row[Self.id],
                                photos: [],
                                tags: [],
