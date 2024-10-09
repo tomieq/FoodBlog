@@ -28,6 +28,7 @@ class WebApp {
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
             template.addCSS(url: "css/style.css")
+            template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
             let body = Template.cached(relativePath: "templates/body.tpl.html")
             let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
             
