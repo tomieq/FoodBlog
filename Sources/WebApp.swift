@@ -17,12 +17,24 @@ class WebApp {
     let db: Connection
     let photoManager: PhotoManager
     let postManager: PostManager
+    let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
+    let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
+    
+    lazy var digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { [unowned self] login in
+        switch login {
+        case "admin": adminPass
+        default: nil
+        }
+    })
     
     init(db: Connection) throws {
         
         self.db = db
         self.photoManager = try PhotoManager(db: db)
         self.postManager = try PostManager(db: db)
+        print("Auth token: \(authToken)")
+        print("Admin pass: \(adminPass)")
+        server.name = "ChickenServer 2.3"
         
         server["/"] = { [unowned self] request, headers in
             let template = BootstrapTemplate()
@@ -49,13 +61,10 @@ class WebApp {
             .movedPermanently("/")
         }
         server["/admin"] = { [unowned self] request, headers in
-            let digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { login in
-                switch login {
-                case "admin": "root"
-                default: nil
-                }
-            })
-            _ = try digest.authorizedUser(request)
+            if request.cookies.get("sid") != authToken {
+                _ = try digest.authorizedUser(request)
+                headers.setCookie(name: "sid", value: authToken, path: "/")
+            }
             let moduleName = request.queryParams.get("module") ?? "photos"
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
