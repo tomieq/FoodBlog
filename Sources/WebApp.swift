@@ -136,7 +136,7 @@ class WebApp {
         let body = Template.cached(relativePath: "templates/body.tpl.html")
         let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
         
-        let posts = try postManager.list(limit: 2, page: page)
+        let posts = try postManager.list(limit: 4, page: page)
         for post in posts {
             postTemplate.reset()
             for photo in post.photos {
