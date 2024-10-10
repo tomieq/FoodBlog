@@ -56,6 +56,7 @@ class WebApp {
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
             template.addCSS(url: "css/sb-admin-2.min.css")
+            template.addJS(url: "js/photoAjaxUpload.js")
             
             storePhotoIfNeeded(request)
             try deletePhotoIfNeeded(request)
@@ -101,6 +102,13 @@ class WebApp {
             template.addJS(code: Template.cached(relativePath: "templates/datePicker.tpl.js"))
             template.body = adminTemplate
             return .ok(.html(template))
+        }
+        server.post["/admin/ajax_photo"] = { [unowned self] request, _ in
+            guard let data = Data(base64Encoded: request.body.data) else {
+                return .badRequest(.text("wrong data"))
+            }
+            _ = try photoManager.store(picture: data)
+            return .ok(.text("OK"))
         }
         server.notFoundHandler = { request, responseHeaders in
             // serve Bootstrap static files
