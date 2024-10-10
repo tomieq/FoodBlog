@@ -34,7 +34,7 @@ struct PhotoManager {
     
     func store(picture: Data) throws -> Photo {
         let image = try Image(data: picture, as: .jpg)
-        let name = (UUID().uuidString + ".jpg").lowercased().replacingOccurrences(of: "-", with: "")
+        let name = Photo.randomName
         let photo = Photo(id: nil,
                           postID: 0,
                           filename: name)
@@ -57,20 +57,29 @@ struct PhotoManager {
             return
         }
         try PhotoTable.remove(db: db, id: photoID)
-        try FileManager.default.removeItem(at: photo.piclocation)
-        try FileManager.default.removeItem(at: photo.thumblocation)
+        try removePhisicalFiles(photo)
     }
     
     func flip(photoID: Int64, direction: FlipDirection) throws {
         guard let photo = try PhotoTable.get(db: db, id: photoID) else {
             return
         }
-        [photo.thumblocation, photo.piclocation].forEach { url in
-            if let image = Image(url: url) {
+        let renamed = photo.renamed
+        try PhotoTable.store(db: db, renamed)
+        func flip(original: URL, renamed: URL) {
+            if let image = Image(url: original) {
                 image.flip(direction.gdDirection)
-                image.write(to: url, allowOverwrite: true)
+                image.write(to: renamed, allowOverwrite: true)
             }
         }
+        flip(original: photo.thumblocation, renamed: renamed.thumblocation)
+        flip(original: photo.piclocation, renamed: renamed.piclocation)
+        try removePhisicalFiles(photo)
         print("Flipped image id: \(photoID) \(direction)")
+    }
+    
+    private func removePhisicalFiles(_ photo: Photo) throws {
+        try FileManager.default.removeItem(at: photo.piclocation)
+        try FileManager.default.removeItem(at: photo.thumblocation)
     }
 }

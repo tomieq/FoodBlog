@@ -25,4 +25,13 @@ extension Photo {
     var thumblocation: URL {
         URL(fileURLWithPath: Volume.thumbsPath + filename)
     }
+    var renamed: Photo {
+        Photo(id: self.id, postID: self.postID, filename: Self.randomName)
+    }
+}
+
+extension Photo {
+    static var randomName: String {
+        (UUID().uuidString + ".jpg").lowercased().replacingOccurrences(of: "-", with: "")
+    }
 }
