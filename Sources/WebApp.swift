@@ -56,7 +56,7 @@ class WebApp {
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
             template.addCSS(url: "css/sb-admin-2.min.css")
-            template.addJS(url: "js/photoAjaxUpload.js")
+            template.addJS(url: "js/photoUpload.js")
             
             storePhotoIfNeeded(request)
             try deletePhotoIfNeeded(request)
@@ -107,6 +107,7 @@ class WebApp {
             guard let data = Data(base64Encoded: request.body.data) else {
                 return .badRequest(.text("wrong data"))
             }
+            print("Received \(data)")
             _ = try photoManager.store(picture: data)
             return .ok(.text("OK"))
         }
@@ -211,6 +212,7 @@ class WebApp {
     
     private func storePhotoIfNeeded(_ request: HttpRequest) {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
+            print("Received \(multiPart.body.count) bytes")
             _ = try? photoManager.store(picture: Data(multiPart.body))
         }
     }

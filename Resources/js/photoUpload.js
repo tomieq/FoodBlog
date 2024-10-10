@@ -49,7 +49,8 @@ function handleFiles()
                 processData: false,
                 type: 'POST',
                 success: function(data){
-                    location.reload();
+                    //location.reload();
+                    window.location.href = "/admin"
                 }
             });
         } // img.onload
