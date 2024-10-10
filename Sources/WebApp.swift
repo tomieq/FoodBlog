@@ -19,6 +19,7 @@ class WebApp {
     let postManager: PostManager
     let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
     let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
+    var pageHtmlCache: [Int: String] = [:]
     
     lazy var digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { [unowned self] login in
         switch login {
@@ -26,6 +27,10 @@ class WebApp {
         default: nil
         }
     })
+    
+    func invalidatePageCache() {
+        pageHtmlCache = [:]
+    }
     
     init(db: Connection) throws {
         
@@ -136,6 +141,9 @@ class WebApp {
     }
     
     private func posts(page: Int) throws -> CustomStringConvertible {
+        if let cached = pageHtmlCache[page] {
+            return cached
+        }
         let template = BootstrapTemplate()
         template.title = "Jem na mieście" + (page > 0 ? " - strona \(page)" : "")
         template.addCSS(url: "/css/style.css")
@@ -165,6 +173,7 @@ class WebApp {
             body.assign(["url":"/strona/\(page + 1)"], inNest: "next")
         }
         template.body = body
+        pageHtmlCache[page] = template.description
         return template
     }
     
@@ -183,6 +192,7 @@ class WebApp {
         if let flipID = request.queryParams.get("flip"), let id = Int64(flipID),
            let direction = request.queryParams.get("direction"), let flipDirection = FlipDirection(rawValue: direction) {
             try photoManager.flip(photoID: id, direction: flipDirection)
+            invalidatePageCache()
         }
     }
     
@@ -199,6 +209,7 @@ class WebApp {
             } else {
                 _ =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
             }
+            invalidatePageCache()
         }
     }
     
@@ -206,7 +217,7 @@ class WebApp {
         // delete image
         if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
             try photoManager.remove(photoID: id)
-            //return .movedTemporarily("/admin?module=\(moduleName)")
+            invalidatePageCache()
         }
     }
     
@@ -214,6 +225,7 @@ class WebApp {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             print("Received \(multiPart.body.count) bytes")
             _ = try? photoManager.store(picture: Data(multiPart.body))
+            invalidatePageCache()
         }
     }
     
