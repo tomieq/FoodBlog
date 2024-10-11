@@ -78,6 +78,8 @@ class AdminServer {
                 module["amount"] = photos.count
                 assignThumbnails(photos, module, postID: 0)
                 module["form"] = addPostForm(photos)
+            case "backup":
+                module = Template.cached(relativePath: "templates/admin.backup.tpl.html")
             default:
                 module = Template.cached(relativePath: "templates/admin.photos.tpl.html")
                 module["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")

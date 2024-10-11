@@ -21,6 +21,7 @@ class WebApp {
     var pageHtmlCache = PageCache()
     let staticServer: StaticFilesServer
     let adminServer: AdminServer
+    let backupServer: BackupServer
     
     init(db: Connection) throws {
         
@@ -37,6 +38,7 @@ class WebApp {
                                       postManager: postManager,
                                       adminPass: adminPass,
                                       authToken: authToken)
+        backupServer = BackupServer(server: server)
         
         server["/"] = { [unowned self] request, headers in
             let page = request.queryParams.get("page")?.int ?? 0
