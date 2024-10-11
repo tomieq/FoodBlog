@@ -69,6 +69,18 @@ extension PostTable {
         return result
     }
     
+    static func get(db: Connection, ids: [Int64], limit: Int, offset: Int) throws -> [Post] {
+        var result: [Post] = []
+        for row in try db.prepare(table.filter(ids.contains(id)).order(Self.date.desc).limit(limit, offset: offset)) {
+            result.append(Post(id: row[Self.id],
+                               photos: [],
+                               title: row[Self.title],
+                               text: row[Self.text],
+                               date: Date(timeIntervalSince1970: row[Self.date])))
+        }
+        return result
+    }
+    
     static func remove(db: Connection, id: Int64) throws {
         try db.run(table.filter(Self.id == id).delete())
     }

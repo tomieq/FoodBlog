@@ -46,6 +46,14 @@ class TagManager {
         let tagIDs = try TagConnectionTable.get(db: db, postID: postID).map { $0.tagID }
         return try TagTable.get(db: db, ids: tagIDs)
     }
+
+    func getPostIDs(tagID: Int64) throws -> [Int64] {
+        try TagConnectionTable.get(db: db, tagID: tagID).map { $0.postID }
+    }
+    
+    func get(seoName: String) throws -> Tag? {
+        try TagTable.get(db: db, seoName: seoName)
+    }
     
     var all: [Tag] {
         get throws {

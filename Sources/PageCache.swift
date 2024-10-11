@@ -9,11 +9,11 @@ import Foundation
 
 class PageCache {
     let dispatchQueue = DispatchQueue(label: "cache", attributes: .concurrent)
-    private var cache: [Int: String] = [:]
+    private var cache: [String: String] = [:]
     
-    func page(_ number: Int) -> String? {
+    func page(_ path: String) -> String? {
         dispatchQueue.sync {
-            cache[number]
+            cache[path]
         }
     }
 
@@ -24,9 +24,9 @@ class PageCache {
         
     }
     
-    func store(page: Int, content: CustomStringConvertible) {
+    func store(path: String, content: CustomStringConvertible) {
         dispatchQueue.sync(flags: .barrier) {
-            cache[page] = content.description
+            cache[path] = content.description
         }
     }
 }

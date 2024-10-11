@@ -63,6 +63,15 @@ extension TagTable {
         return result
     }
     
+    static func get(db: Connection, seoName: String) throws -> Tag? {
+        if let row = try db.pluck(table.filter(Self.seoName == seoName)) {
+            return Tag(id: row[Self.id],
+                       name: row[Self.name],
+                       seoName: row[Self.seoName])
+        }
+        return nil
+    }
+    
     static func all(db: Connection) throws -> [Tag] {
         var result: [Tag] = []
         for row in try db.prepare(table) {

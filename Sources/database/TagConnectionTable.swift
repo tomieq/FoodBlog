@@ -43,6 +43,16 @@ extension TagConnectionTable {
         }
         return result
     }
+
+    static func get(db: Connection, tagID: Int64) throws -> [TagConnection] {
+        var result: [TagConnection] = []
+        for row in try db.prepare(table.filter(Self.tagID == tagID)) {
+            result.append(TagConnection(id: row[Self.id],
+                                     postID: row[Self.postID],
+                                     tagID: row[Self.tagID]))
+        }
+        return result
+    }
     
     static func remove(db: Connection, ids: [Int64]) throws {
         guard ids.isEmpty.not else { return }

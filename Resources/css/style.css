@@ -35,6 +35,10 @@ h2, h3, h4 {
   font-family: 'Dancing Script', cursive;
 }
 
+.readableFont {
+    font-family: "Open Sans", sans-serif;
+}
+
 .heading_container {
   display: -webkit-box;
   display: -ms-flexbox;

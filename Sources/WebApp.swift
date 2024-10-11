@@ -19,10 +19,11 @@ class WebApp {
     let tagManager: TagManager
     let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
     let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
-    var pageHtmlCache = PageCache()
+    var pageCache = PageCache()
     let staticServer: StaticFilesServer
     let adminServer: AdminServer
     let backupServer: BackupServer
+    let postsPerPage = 4
     
     init(db: Connection) throws {
         
@@ -36,7 +37,7 @@ class WebApp {
         staticServer = StaticFilesServer(server: server)
         adminServer = try AdminServer(server: server,
                                       db: db,
-                                      pageCache: pageHtmlCache,
+                                      pageCache: pageCache,
                                       postManager: postManager,
                                       tagManager: tagManager,
                                       adminPass: adminPass,
@@ -44,12 +45,26 @@ class WebApp {
         backupServer = BackupServer(server: server)
         
         server["/"] = { [unowned self] request, headers in
-            let page = request.queryParams.get("page")?.int ?? 0
-            return .ok(.html(try posts(page: page)))
+            return .ok(.html(try posts(page: 0, path: request.path)))
         }
         server["/strona/:page"] = { [unowned self] request, headers in
             let page = request.pathParams.get("page")?.int ?? 0
-            return .ok(.html(try posts(page: page)))
+            return .ok(.html(try posts(page: page, path: request.path)))
+        }
+        server["/tag/:seoName"] = { [unowned self] request, headers in
+            guard let seoName = request.pathParams.get("seoName"),
+                  let tag = try tagManager.get(seoName: seoName) else {
+                return .notFound()
+            }
+            return .ok(.html(try posts(tag: tag, page: 0, path: request.path)))
+        }
+        server["/tag/:seoName/:page"] = { [unowned self] request, headers in
+            guard let seoName = request.pathParams.get("seoName"),
+                  let tag = try tagManager.get(seoName: seoName) else {
+                return .notFound()
+            }
+            let page = request.pathParams.get("page")?.int ?? 0
+            return .ok(.html(try posts(tag: tag, page: page, path: request.path)))
         }
         server["/index.html"] = { _, _ in
             .movedPermanently("/")
@@ -67,12 +82,58 @@ class WebApp {
         try server.start(8080)
     }
     
-    private func posts(page: Int) throws -> CustomStringConvertible {
-        if let cached = pageHtmlCache.page(page) {
+    private func posts(page: Int, path: String) throws -> CustomStringConvertible {
+        if let cached = pageCache.page(path) {
             return cached
         }
+        let posts = try postManager.list(limit: postsPerPage, page: page)
+        var previousPath: String? = nil
+        var nextPath: String? = nil
+        if page > 0 {
+            previousPath = page == 1 ? "/" : "/strona/\(page - 1)"
+        }
+        if posts.count == postsPerPage {
+            nextPath = "/strona/\(page + 1)"
+        }
+
+        return try response(posts: posts,
+                            path: path,
+                            title: "Jem na mieście" + (page > 0 ? " - strona \(page)" : ""),
+                            previousPath: previousPath,
+                            nextPath: nextPath)
+    }
+    
+    private func posts(tag: Tag, page: Int, path: String) throws -> CustomStringConvertible {
+        if let cached = pageCache.page(path) {
+            return cached
+        }
+        let postIDs = try tagManager.getPostIDs(tagID: tag.id!)
+        let posts = try postManager.list(ids: postIDs, limit: postsPerPage, page: page)
+        var previousPath: String? = nil
+        var nextPath: String? = nil
+        if page > 0 {
+            previousPath = page == 1 ? "/tag/\(tag.seoName)" : "/tag/\(tag.seoName)/\(page - 1)"
+        }
+        if posts.count == postsPerPage {
+            nextPath = "/tag/\(tag.seoName)/\(page + 1)"
+        }
+
+        return try response(posts: posts,
+                            path: path,
+                            title: "Jem na mieście - \(tag.name)" + (page > 0 ? " - strona \(page)" : ""),
+                            subtitle: "#\(tag.name)",
+                            previousPath: previousPath,
+                            nextPath: nextPath)
+    }
+    
+    private func response(posts: [Post],
+                          path: String,
+                          title: String,
+                          subtitle: String? = nil,
+                          previousPath: String?,
+                          nextPath: String?) throws -> CustomStringConvertible {
         let template = BootstrapTemplate()
-        template.title = "Jem na mieście" + (page > 0 ? " - strona \(page)" : "")
+        template.title = title
         template.addCSS(url: "/css/style.css?v=3")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
@@ -80,7 +141,6 @@ class WebApp {
         let body = Template.cached(relativePath: "templates/body.tpl.html")
         let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
         
-        let posts = try postManager.list(limit: 4, page: page)
         for post in posts {
             postTemplate.reset()
             for photo in post.photos {
@@ -95,16 +155,19 @@ class WebApp {
             }
             body.assign(["content": postTemplate], inNest: "post")
         }
-        if page > 0 {
-            let url = page == 1 ? "/" : "/strona/\(page - 1)"
-            body.assign(["url":url], inNest: "previous")
+        if let previousPath = previousPath {
+            body.assign(["url": previousPath], inNest: "previous")
         }
-        if posts.count > 0 {
-            body.assign(["url":"/strona/\(page + 1)"], inNest: "next")
+        if let nextPath = nextPath {
+            body.assign(["url": nextPath], inNest: "next")
+        }
+        if let subtitle = subtitle {
+            body.assign(["title": subtitle], inNest: "subtitle")
         }
         template.body = body
-        pageHtmlCache.store(page: page, content: template)
+        if posts.isEmpty.not {
+            pageCache.store(path: path, content: template)
+        }
         return template
     }
-    
 }
