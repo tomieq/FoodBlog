@@ -20,6 +20,7 @@ class WebApp {
     let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
     let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
     var pageHtmlCache = PageCache()
+    let staticServer: StaticFilesServer
     
     lazy var digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { [unowned self] login in
         switch login {
@@ -36,6 +37,7 @@ class WebApp {
         print("Auth token: \(authToken)")
         print("Admin pass: \(adminPass)")
         server.name = "ChickenServer 2.3"
+        staticServer = StaticFilesServer(server: server)
         
         server["/"] = { [unowned self] request, headers in
             let page = request.queryParams.get("page")?.int ?? 0
@@ -111,17 +113,6 @@ class WebApp {
             print("Received \(data)")
             _ = try photoManager.store(picture: data)
             return .ok(.text("OK"))
-        }
-        server.notFoundHandler = { request, responseHeaders in
-            // serve Bootstrap static files
-            if let filePath = BootstrapTemplate.absolutePath(for: request.path) {
-                try HttpFileResponse.with(absolutePath: filePath, clientCache: .days(7))
-            }
-            try HttpFileResponse.with(absolutePath: Volume.path + request.path, clientCache: .days(7))
-
-            let resourcePath = Resource().absolutePath(for: request.path)
-            try HttpFileResponse.with(absolutePath: resourcePath, clientCache: .days(7))
-            return .notFound()
         }
         server.middleware.append( { request, header in
             print("Request \(request.id) \(request.method) \(request.path) from \(request.peerName ?? "")")
