@@ -50,7 +50,6 @@ extension PostTable {
         if let row = try db.pluck(table.filter(Self.id == id)) {
             return Post(id: row[Self.id],
                         photos: [],
-                        tags: [],
                         title: row[Self.title],
                         text: row[Self.text],
                         date: Date(timeIntervalSince1970: row[Self.date]))
@@ -63,7 +62,6 @@ extension PostTable {
         for row in try db.prepare(table.order(Self.date.desc).limit(limit, offset: offset)) {
             result.append(Post(id: row[Self.id],
                                photos: [],
-                               tags: [],
                                title: row[Self.title],
                                text: row[Self.text],
                                date: Date(timeIntervalSince1970: row[Self.date])))

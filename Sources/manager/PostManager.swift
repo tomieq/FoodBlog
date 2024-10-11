@@ -17,7 +17,6 @@ struct PostManager {
     
     func store(title: String, text: String, date: Date, photoIDs: [Int64]) throws -> Post {
         let post = Post(photos: try PhotoTable.get(db: db, ids: photoIDs),
-                        tags: [],
                         title: title,
                         text: text,
                         date: date)
@@ -32,7 +31,6 @@ struct PostManager {
     func update(_ post: Post, title: String, text: String, date: Date, photoIDs: [Int64]) throws -> Post {
         let updatedPost = Post(id: post.id,
                                photos: try PhotoTable.get(db: db, ids: photoIDs),
-                               tags: [],
                                title: title,
                                text: text,
                                date: date)

@@ -23,7 +23,7 @@ class BackupServer {
         }
         
         server.get["admin/foodBlogBackup.tar"] = { _, _ in
-            try HttpFileResponse.with(absolutePath: "foodBlogBackup.tar", clientCache: CacheTime.none)
+            try HttpFileResponse.with(absolutePath: "foodBlogBackup.tar", clientCache: .noCache)
             return .ok(.text("Backup does not exist. Generate it first"))
         }
     }

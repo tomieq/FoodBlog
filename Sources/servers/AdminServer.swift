@@ -14,6 +14,7 @@ class AdminServer {
 
     let photoManager: PhotoManager
     let postManager: PostManager
+    let tagManager: TagManager
     let pageCache: PageCache
     let digest: DigestAuthentication
     
@@ -21,11 +22,13 @@ class AdminServer {
          db: Connection,
          pageCache: PageCache,
          postManager: PostManager,
+         tagManager: TagManager,
          adminPass: String,
          authToken: String) throws {
 
         self.photoManager = try PhotoManager(db: db)
         self.postManager = postManager
+        self.tagManager = tagManager
         self.pageCache = pageCache
 
         self.digest = DigestAuthentication(realm: "Swifter Digest", credentialsProvider: { login in
@@ -42,8 +45,11 @@ class AdminServer {
             }
             let moduleName = request.queryParams.get("module") ?? "photos"
             let template = BootstrapTemplate()
-            template.title = "Jem na mieście"
+            template.title = "Admin"
+            template.addCSS(url: "css/inputTags.css")
             template.addJS(url: "js/photoUpload.js")
+            template.addJS(url: "js/inputTags.jquery.min.js")
+            template.addJS(code: Template.cached(relativePath: "templates/admin.post.edit.tpl.js"))
             
             storePhotoIfNeeded(request)
             try deletePhotoIfNeeded(request)
@@ -70,7 +76,7 @@ class AdminServer {
                 let photos = try PhotoTable.get(db: db, postID: post.id!)
                 module["amount"] = photos.count
                 assignThumbnails(photos, module, postID: post.id!)
-                module["form"] = editPostForm(post, photos)
+                module["form"] = try editPostForm(post, photos)
             case "add.post":
                 module = Template.cached(relativePath: "templates/admin.add.post.tpl.html")
                 let photos = try PhotoTable.unowned(db: db)
@@ -88,7 +94,6 @@ class AdminServer {
             }
             adminTemplate["module"] = module
 
-            template.addJS(code: Template.cached(relativePath: "templates/datePicker.tpl.js"))
             template.body = adminTemplate
             return .ok(.html(template))
         }
@@ -125,16 +130,20 @@ class AdminServer {
     private func publishPostIfNeeded(_ request: HttpRequest) throws {
         // add post
         if let title = request.formData.get("title"), let text = request.formData.get("text"),
+           !text.isEmpty, !title.isEmpty, let tagList = request.formData.get("tags")?.split(separator: ","),
            let ids = request.formData.get("pictureIDs"), let dateString = request.formData.get("date"),
            let date = Date.make(from: dateString) {
             let photoIDs = ids.components(separatedBy: ",")
                 .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .compactMap { Int64($0)}
+            var updatedPost: Post!
             if let postID = request.formData.get("postID"), let id = Int64(postID), let post = try postManager.get(id: id) {
-                _ = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs)
+                updatedPost = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs)
             } else {
-                _ =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
+                updatedPost =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
             }
+            let tagNames = tagList.map { "\($0)".trimmingCharacters(in: .whitespacesAndNewlines) }
+            try tagManager.assignTagsToPost(names: tagNames, postID: updatedPost.id!)
             pageCache.invalidate()
         }
     }
@@ -155,12 +164,14 @@ class AdminServer {
         }
     }
     
-    private func editPostForm(_ post: Post, _ photos: [Photo]) -> Form {
+    private func editPostForm(_ post: Post, _ photos: [Photo]) throws -> Form {
         let form = Form(url: "/admin", method: "POST")
         form.addInputText(name: "title", label: "Tytuł posta", value: post.title)
         form.addTextarea(name: "text", label: "Treść", value: post.text, rows: 10)
         form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
+        let tags = try tagManager.getTags(postID: post.id!)
+        form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
         form.addHidden(name: "postID", value: post.id!)
         form.addSubmit(name: "add", label: "Aktualizuj", style: .success)
         return form
@@ -172,6 +183,7 @@ class AdminServer {
         form.addTextarea(name: "text", label: "Treść", rows: 10)
         form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "date", label: "Data", value: Date().readable)
+        form.addInputText(name: "tags", label: "Tagi", value: "")
         form.addSubmit(name: "add", label: "Opublikuj", style: .success)
         return form
     }

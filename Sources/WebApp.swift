@@ -16,6 +16,7 @@ class WebApp {
     let server = HttpServer()
     let db: Connection
     let postManager: PostManager
+    let tagManager: TagManager
     let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
     let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
     var pageHtmlCache = PageCache()
@@ -27,6 +28,7 @@ class WebApp {
         
         self.db = db
         self.postManager = try PostManager(db: db)
+        self.tagManager = try TagManager(db: db)
         
         print("Auth token: \(authToken)")
         print("Admin pass: \(adminPass)")
@@ -36,6 +38,7 @@ class WebApp {
                                       db: db,
                                       pageCache: pageHtmlCache,
                                       postManager: postManager,
+                                      tagManager: tagManager,
                                       adminPass: adminPass,
                                       authToken: authToken)
         backupServer = BackupServer(server: server)
@@ -70,7 +73,7 @@ class WebApp {
         }
         let template = BootstrapTemplate()
         template.title = "Jem na mieście" + (page > 0 ? " - strona \(page)" : "")
-        template.addCSS(url: "/css/style.css")
+        template.addCSS(url: "/css/style.css?v=3")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
@@ -87,6 +90,9 @@ class WebApp {
             postTemplate["text"] = post.text
             postTemplate["date"] = post.date.readable
             postTemplate["postID"] = post.id
+            try tagManager.getTags(postID: post.id!).forEach {
+                postTemplate.assign($0, inNest: "tag")
+            }
             body.assign(["content": postTemplate], inNest: "post")
         }
         if page > 0 {
