@@ -450,3 +450,8 @@ a:focus {
     background-color: #FFA500 !important;
     text-decoration: none;
 }
+
+.btn-navi, .btn-navi:hover, .btn-navi:active, .btn-navi:visited {
+    background-color: #808000 !important;
+    text-decoration: none;
+}
