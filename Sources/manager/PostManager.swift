@@ -51,4 +51,8 @@ struct PostManager {
         }
         return posts
     }
+    
+    func get(id: Int64) throws -> Post? {
+        try PostTable.get(db: db, id: id)
+    }
 }
