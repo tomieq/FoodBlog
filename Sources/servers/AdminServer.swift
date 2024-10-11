@@ -43,7 +43,6 @@ class AdminServer {
             let moduleName = request.queryParams.get("module") ?? "photos"
             let template = BootstrapTemplate()
             template.title = "Jem na mieście"
-            template.addCSS(url: "css/sb-admin-2.min.css")
             template.addJS(url: "js/photoUpload.js")
             
             storePhotoIfNeeded(request)
@@ -51,7 +50,7 @@ class AdminServer {
             try flipPhotoIfNeeded(request)
             try publishPostIfNeeded(request)
 
-            let adminTemplate = Template.load(relativePath: "templates/admin.tpl.html")
+            let adminTemplate = Template.cached(relativePath: "templates/admin.tpl.html")
             
             var module: Template!
             switch moduleName {
