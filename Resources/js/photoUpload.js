@@ -18,20 +18,20 @@ function handleFiles()
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
 
-            var MAX_WIDTH = 2048;
-            var MAX_HEIGHT = 2048;
+            var maxWidth = 2048;
+            var maxHeight = 2048;
             var width = img.width;
             var height = img.height;
 
             if (width > height) {
-              if (width > MAX_WIDTH) {
-                height *= MAX_WIDTH / width;
-                width = MAX_WIDTH;
+              if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
               }
             } else {
-              if (height > MAX_HEIGHT) {
-                width *= MAX_HEIGHT / height;
-                height = MAX_HEIGHT;
+              if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
               }
             }
             canvas.width = width;
@@ -48,8 +48,7 @@ function handleFiles()
                 contentType: false,
                 processData: false,
                 type: 'POST',
-                success: function(data){
-                    //location.reload();
+                success: function(data) {
                     window.location.href = "/admin"
                 }
             });
