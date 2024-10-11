@@ -46,4 +46,10 @@ class TagManager {
         let tagIDs = try TagConnectionTable.get(db: db, postID: postID).map { $0.tagID }
         return try TagTable.get(db: db, ids: tagIDs)
     }
+    
+    var all: [Tag] {
+        get throws {
+            try TagTable.all(db: db)
+        }
+    }
 }

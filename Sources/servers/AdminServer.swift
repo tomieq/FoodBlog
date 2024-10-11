@@ -46,10 +46,15 @@ class AdminServer {
             let moduleName = request.queryParams.get("module") ?? "photos"
             let template = BootstrapTemplate()
             template.title = "Admin"
-            template.addCSS(url: "css/inputTags.css")
+            template.addCSS(url: "css/tagify.css")
             template.addJS(url: "js/photoUpload.js")
-            template.addJS(url: "js/inputTags.jquery.min.js")
-            template.addJS(code: Template.cached(relativePath: "templates/admin.post.edit.tpl.js"))
+            template.addJS(url: "js/tagify.js")
+            
+            func addFormJavaScript() throws {
+                let jsTemplate = Template.cached(relativePath: "templates/admin.post.edit.tpl.js")
+                jsTemplate["tagHistory"] = try tagManager.all.map{ "'\($0.name)'" }.joined(separator: ",")
+                template.addJS(code: jsTemplate)
+            }
             
             storePhotoIfNeeded(request)
             try deletePhotoIfNeeded(request)
@@ -77,12 +82,14 @@ class AdminServer {
                 module["amount"] = photos.count
                 assignThumbnails(photos, module, postID: post.id!)
                 module["form"] = try editPostForm(post, photos)
+                try addFormJavaScript()
             case "add.post":
                 module = Template.cached(relativePath: "templates/admin.add.post.tpl.html")
                 let photos = try PhotoTable.unowned(db: db)
                 module["amount"] = photos.count
                 assignThumbnails(photos, module, postID: 0)
                 module["form"] = addPostForm(photos)
+                try addFormJavaScript()
             case "backup":
                 module = Template.cached(relativePath: "templates/admin.backup.tpl.html")
             default:

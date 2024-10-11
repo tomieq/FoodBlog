@@ -63,6 +63,16 @@ extension TagTable {
         return result
     }
     
+    static func all(db: Connection) throws -> [Tag] {
+        var result: [Tag] = []
+        for row in try db.prepare(table) {
+            result.append(Tag(id: row[Self.id],
+                              name: row[Self.name],
+                              seoName: row[Self.seoName]))
+        }
+        return result
+    }
+    
     static func remove(db: Connection, id: Int64) throws {
         try db.run(table.filter(Self.id == id).delete())
     }
