@@ -1,4 +1,4 @@
-
+var tagifyPhotos;
 $( function() {
     $('input[name="date"]').datepicker({
       dateFormat: "yy-mm-dd"
@@ -10,7 +10,7 @@ $( function() {
         originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(',')
     });
     var inputPhoto = document.querySelector('input[name="pictureIDs"]');
-    var tagifyPhotos = new Tagify(inputPhoto, {
+    tagifyPhotos = new Tagify(inputPhoto, {
         originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(',')
     });
 
