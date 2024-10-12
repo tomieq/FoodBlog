@@ -79,18 +79,18 @@ struct PageCacheTests {
                                                                         tagIDs: [101, 102, 103],
                                                                         isOnMainStory: false))
         #expect(sut.page("mainPage") != nil)
-        #expect(sut.page("tags") != nil)
+        #expect(sut.page("tagPage") != nil)
         sut.invalidate(meta: CacheMetaData(postIDs: [9],
                                            photoIDs: [14],
                                            tagIDs: [104, 105],
                                            isOnMainStory: false))
         #expect(sut.page("mainPage") != nil)
-        #expect(sut.page("tags") != nil)
+        #expect(sut.page("tagPage") != nil)
         sut.invalidate(meta: CacheMetaData(postIDs: [9],
-                                           photoIDs: [12],
+                                           photoIDs: [14],
                                            tagIDs: [104],
                                            isOnMainStory: true))
         #expect(sut.page("mainPage") == nil)
-        #expect(sut.page("tags") != nil)
+        #expect(sut.page("tagPage") != nil)
     }
 }
