@@ -34,10 +34,20 @@ struct PostManager {
                                text: text,
                                date: date)
         try PostTable.store(db: db, updatedPost)
-        for photo in try PhotoTable.get(db: db, ids: photoIDs) {
-            photo.postID = post.id!
-            photo.sequence = photoIDs.firstIndex(of: photo.id!) ?? 0
+        // unassign
+        for photo in try PhotoTable.get(db: db, postID: post.id!) where photoIDs.contains(photo.id!).not {
+            photo.postID = 0
+            photo.sequence = 0
             try PhotoTable.store(db: db, photo)
+        }
+        // assign with proper sequence
+        for photo in try PhotoTable.get(db: db, ids: photoIDs) {
+            let sequence = photoIDs.firstIndex(of: photo.id!) ?? 0
+            if photo.postID != post.id || photo.sequence != sequence {
+                photo.postID = post.id!
+                photo.sequence = sequence
+                try PhotoTable.store(db: db, photo)
+            }
         }
         return updatedPost
     }

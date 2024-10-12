@@ -172,7 +172,6 @@ class AdminServer {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             print("Received \(multiPart.body.count) bytes")
             _ = try? photoManager.store(picture: Data(multiPart.body))
-            pageCache.invalidate()
         }
     }
     
@@ -187,6 +186,7 @@ class AdminServer {
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
         let tags = try tagManager.getTags(postID: post.id!)
         form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
+        form.addSeparator(txt: "Original tags: \(tags.map { $0.name }.joined(separator: ","))")
         form.addHidden(name: "postID", value: post.id!)
         form.addSubmit(name: "add", label: "Aktualizuj", style: .success)
         return form
