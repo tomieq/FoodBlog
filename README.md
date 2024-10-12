@@ -18,3 +18,8 @@ export admin_pass={some_password_here}
 export auth_token={some_token_here}
 swift build && .build/debug/FoodBlog
 ```
+# Unit tests
+```
+docker build -t tomieq/food_test:1.0 -f TestDockerfile .
+docker run --rm -v "$PWD:/code" -w /code tomieq/food_test:1.0 swift test
+```

@@ -16,8 +16,9 @@ class TagManager {
         try TagConnectionTable.create(db: db)
     }
     
-    func assignTagsToPost(names: [String], postID: Int64) throws {
+    func assignTagsToPost(names: [String], postID: Int64) throws -> [Int64] {
         var tags = try TagTable.get(db: db, names: names)
+        var changedTagIDs: [Int64] = []
         // create non existing tags
         let existingTagNames = tags.map{ $0.name }
         for name in names {
@@ -25,21 +26,25 @@ class TagManager {
                 let tag = Tag(name: name, seoName: name.seo)
                 try TagTable.store(db: db, tag)
                 tags.append(tag)
+                changedTagIDs.append(tag.id!)
             }
         }
         // remove connections to tags that were removed
         let tagIDs = tags.compactMap{ $0.id }
         let connections = try TagConnectionTable.get(db: db, postID: postID)
-        let connectionIDsToRemove = connections.filter { tagIDs.contains($0.tagID).not }.map { $0.id }
+        let connectionsToUnassign = connections.filter { tagIDs.contains($0.tagID).not }
+        changedTagIDs += connectionsToUnassign.map { $0.tagID }
 
-        try TagConnectionTable.remove(db: db, ids: connectionIDsToRemove)
+        try TagConnectionTable.remove(db: db, ids: connectionsToUnassign.map { $0.id })
 
         let connectedTagIDs = connections.map { $0.tagID }
         for tag in tags {
             if connectedTagIDs.contains(tag.id!).not {
                 try TagConnectionTable.store(db: db, tagID: tag.id!, postID: postID)
+                changedTagIDs.append(tag.id!)
             }
         }
+        return changedTagIDs
     }
     
     func getTags(postID: Int64) throws -> [Tag] {

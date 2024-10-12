@@ -7,9 +7,17 @@
 
 import Foundation
 
+struct CacheMetaData {
+    let postIDs: [Int64]
+    let photoIDs: [Int64]
+    let tagIDs: [Int64]
+    let isOnMainStory: Bool
+}
+
 class PageCache {
     let dispatchQueue = DispatchQueue(label: "cache", attributes: .concurrent)
     private var cache: [String: String] = [:]
+    private var metaData: [String: CacheMetaData] = [:]
     
     func page(_ path: String) -> String? {
         dispatchQueue.sync {
@@ -17,16 +25,35 @@ class PageCache {
         }
     }
 
-    func invalidate() {
+    func invalidateAll() {
         dispatchQueue.sync(flags: .barrier) {
             cache = [:]
+            metaData = [:]
+            print("Invalidated all cache")
         }
-        
     }
     
-    func store(path: String, content: CustomStringConvertible) {
+    func invalidate(meta: CacheMetaData) {
+        dispatchQueue.sync(flags: .barrier) {
+            let pathsToInvalidate = metaData.filter { data in
+                data.value.postIDs.hasCommonElements(with: meta.postIDs) ||
+                data.value.photoIDs.hasCommonElements(with: meta.photoIDs) ||
+                data.value.tagIDs.hasCommonElements(with: meta.tagIDs) ||
+                (meta.isOnMainStory && data.value.isOnMainStory)
+            }.map { $0.key }
+            pathsToInvalidate.forEach { path in
+                cache[path] = nil
+                metaData[path] = nil
+            }
+            print("Invalidated cache for \(pathsToInvalidate.count) entries: [\(pathsToInvalidate)]")
+        }
+    }
+    
+    func store(path: String, content: CustomStringConvertible, meta: CacheMetaData) {
         dispatchQueue.sync(flags: .barrier) {
             cache[path] = content.description
+            metaData[path] = meta
+            print("Cached page at \(path)")
         }
     }
 }

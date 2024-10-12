@@ -144,10 +144,13 @@ class WebApp {
         let body = Template.cached(relativePath: "templates/body.tpl.html")
         let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
         
+        var visiblePhotoIDs: [Int64] = []
+        var visibleTagIDs: [Int64] = []
         for post in posts {
             postTemplate.reset()
             for photo in try photoManager.get(postID: post.id!) {
                 postTemplate.assign(["path": "/pics/\(photo.filename)"], inNest: "pic")
+                visiblePhotoIDs.append(photo.id!)
             }
             postTemplate["title"] = post.title
             postTemplate["text"] = post.text
@@ -155,6 +158,7 @@ class WebApp {
             postTemplate["postID"] = post.id
             try tagManager.getTags(postID: post.id!).forEach {
                 postTemplate.assign($0, inNest: "tag")
+                visibleTagIDs.append($0.id!)
             }
             body.assign(["content": postTemplate], inNest: "post")
         }
@@ -169,7 +173,11 @@ class WebApp {
         }
         template.body = body
         if posts.isEmpty.not {
-            pageCache.store(path: path, content: template)
+            let meta = CacheMetaData(postIDs: posts.compactMap { $0.id },
+                                     photoIDs: visiblePhotoIDs.unique,
+                                     tagIDs: visibleTagIDs.unique,
+                                     isOnMainStory: tag == nil)
+            pageCache.store(path: path, content: template, meta: meta)
         }
         return template
     }

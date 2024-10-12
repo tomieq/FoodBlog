@@ -56,12 +56,13 @@ struct PhotoManager {
         try PhotoTable.get(db: db, postID: postID)
     }
     
-    func remove(photoID: Int64) throws {
+    func remove(photoID: Int64) throws -> Photo? {
         guard let photo = try PhotoTable.get(db: db, id: photoID) else {
-            return
+            return nil
         }
         try PhotoTable.remove(db: db, id: photoID)
         try removePhisicalFiles(photo)
+        return photo
     }
     
     func flip(photoID: Int64, direction: FlipDirection) throws {

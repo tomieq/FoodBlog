@@ -134,7 +134,10 @@ class AdminServer {
         if let flipID = request.queryParams.get("flip"), let id = Int64(flipID),
            let direction = request.queryParams.get("direction"), let flipDirection = FlipDirection(rawValue: direction) {
             try photoManager.flip(photoID: id, direction: flipDirection)
-            self.pageCache.invalidate()
+            self.pageCache.invalidate(meta: CacheMetaData(postIDs: [],
+                                                          photoIDs: [id],
+                                                          tagIDs: [],
+                                                          isOnMainStory: false))
         }
     }
     
@@ -149,22 +152,31 @@ class AdminServer {
                 .compactMap { Int64($0)}
             print(photoIDs)
             var updatedPost: Post!
+            var isOnMainStory = false
             if let postID = request.formData.get("postID"), let id = Int64(postID), let post = try postManager.get(id: id) {
                 updatedPost = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs)
             } else {
                 updatedPost =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs)
+                isOnMainStory = true
             }
             let tagNames = tagList.map { "\($0)".trimmingCharacters(in: .whitespacesAndNewlines) }
-            try tagManager.assignTagsToPost(names: tagNames, postID: updatedPost.id!)
-            pageCache.invalidate()
+            let changedTagIDs = try tagManager.assignTagsToPost(names: tagNames, postID: updatedPost.id!)
+            pageCache.invalidate(meta: CacheMetaData(postIDs: [updatedPost.id!],
+                                                     photoIDs: [],
+                                                     tagIDs: changedTagIDs,
+                                                     isOnMainStory: isOnMainStory))
         }
     }
     
     private func deletePhotoIfNeeded(_ request: HttpRequest) throws {
         // delete image
         if let deleteID = request.queryParams.get("deleteID"), let id = Int64(deleteID) {
-            try photoManager.remove(photoID: id)
-            pageCache.invalidate()
+            if let postID = try photoManager.remove(photoID: id)?.postID {
+                pageCache.invalidate(meta: CacheMetaData(postIDs: [postID],
+                                                         photoIDs: [],
+                                                         tagIDs: [],
+                                                         isOnMainStory: false))
+            }
         }
     }
     
