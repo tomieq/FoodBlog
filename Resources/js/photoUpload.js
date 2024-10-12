@@ -49,7 +49,7 @@ function handleFiles()
                 processData: false,
                 type: 'POST',
                 success: function(data) {
-                    window.location.href = "/admin"
+                    window.location.href = "/admin?module=photos"
                 }
             });
         } // img.onload

@@ -44,14 +44,12 @@ class AdminServer {
                 _ = try digest.authorizedUser(request)
                 headers.setCookie(name: "sid", value: authToken, path: "/")
             }
-            let moduleName = request.queryParams.get("module") ?? "photos"
+            let moduleName = request.queryParams.get("module") ?? "welcome"
             let template = BootstrapTemplate()
             template.title = "Admin"
             template.addCSS(url: "css/tagify.css")
-            template.addCSS(url: "css/dragsort.css")
-            template.addJS(url: "js/photoUpload.js")
+            template.addJS(url: "js/photoUpload.js?v=2")
             template.addJS(url: "js/tagify.js")
-            template.addJS(url: "js/dragsort.js")
             
             func addFormJavaScript() throws {
                 let jsTemplate = Template.cached(relativePath: "templates/admin.post.edit.tpl.js")
@@ -96,12 +94,14 @@ class AdminServer {
                 try addFormJavaScript()
             case "backup":
                 module = Template.cached(relativePath: "templates/admin.backup.tpl.html")
-            default:
+            case "photos":
                 module = Template.cached(relativePath: "templates/admin.photos.tpl.html")
                 module["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
                 let photos = try PhotoTable.get(db: db, last: 12)
                 module["amount"] = photos.count
                 assignThumbnails(photos, module, postID: 0)
+            default:
+                module = Template.cached(relativePath: "templates/admin.welcome.tpl.html")
             }
             adminTemplate["module"] = module
 
