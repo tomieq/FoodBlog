@@ -48,8 +48,10 @@ class AdminServer {
             let template = BootstrapTemplate()
             template.title = "Admin"
             template.addCSS(url: "css/tagify.css")
+            template.addCSS(url: "css/dragsort.css")
             template.addJS(url: "js/photoUpload.js")
             template.addJS(url: "js/tagify.js")
+            template.addJS(url: "js/dragsort.js")
             
             func addFormJavaScript() throws {
                 let jsTemplate = Template.cached(relativePath: "templates/admin.post.edit.tpl.js")
@@ -176,9 +178,12 @@ class AdminServer {
     
     private func editPostForm(_ post: Post, _ photos: [Photo]) throws -> Form {
         let form = Form(url: "/admin", method: "POST")
-        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
+        form.addInputText(name: "pictureIDs",
+                          label: "ID zdjęć oddzielone przecinkami",
+                          value: photos.map{ "\($0.id!)" }.joined(separator: ","),
+                          attributes: ["inputmode": "numeric"])
         form.addInputText(name: "title", label: "Tytuł posta", value: post.title)
-        form.addTextarea(name: "text", label: "Treść", value: post.text, rows: 10)
+        form.addTextarea(name: "text", label: "Treść", rows: 10, value: post.text)
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
         let tags = try tagManager.getTags(postID: post.id!)
         form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
@@ -189,7 +194,10 @@ class AdminServer {
     
     private func addPostForm(_ photos: [Photo]) -> Form {
         let form = Form(url: "/admin", method: "POST")
-        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
+        form.addInputText(name: "pictureIDs",
+                          label: "ID zdjęć oddzielone przecinkami",
+                          value: photos.map{ "\($0.id!)" }.joined(separator: ","),
+                          attributes: ["inputmode": "numeric"])
         form.addInputText(name: "title", label: "Tytuł posta")
         form.addTextarea(name: "text", label: "Treść", rows: 10)
         form.addInputText(name: "date", label: "Data", value: Date().readable)
