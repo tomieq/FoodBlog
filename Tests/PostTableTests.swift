@@ -15,7 +15,6 @@ struct PostTableTests {
         let date = Date()
         let post = Post(id: nil,
                         photos: [],
-                        tags: [],
                         title: "Nice title",
                         text: "Eating out is awesome!",
                         date: date)

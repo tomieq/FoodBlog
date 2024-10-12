@@ -7,27 +7,33 @@
 import Foundation
 
 struct SeoConverter {
+    
+    private static let map = [ "ą": "a",
+                               "Ą": "A",
+                               "ś": "s",
+                               "Ś": "S",
+                               "ć": "c",
+                               "Ć": "C",
+                               "ł": "l",
+                               "Ł": "L",
+                               "ó": "o",
+                               "Ó": "O",
+                               "ż": "z",
+                               "Ż": "Z",
+                               "ź": "z",
+                               "Ź": "Z",
+                               "ę": "e",
+                               "Ę": "E",
+                               "ń": "n",
+                               "Ń": "N"]
     static func asciiString(_ text: String) -> String {
-        text
-            .replacingOccurrences(of: "ą", with: "a")
-            .replacingOccurrences(of: "Ą", with: "A")
-            .replacingOccurrences(of: "ś", with: "s")
-            .replacingOccurrences(of: "Ś", with: "S")
-            .replacingOccurrences(of: "ć", with: "c")
-            .replacingOccurrences(of: "Ć", with: "C")
-            .replacingOccurrences(of: "ł", with: "l")
-            .replacingOccurrences(of: "Ł", with: "L")
-            .replacingOccurrences(of: "ó", with: "o")
-            .replacingOccurrences(of: "Ó", with: "O")
-            .replacingOccurrences(of: "ż", with: "z")
-            .replacingOccurrences(of: "Ż", with: "Z")
-            .replacingOccurrences(of: "ź", with: "z")
-            .replacingOccurrences(of: "Ź", with: "Z")
-            .replacingOccurrences(of: "ę", with: "e")
-            .replacingOccurrences(of: "Ę", with: "E")
-            .replacingOccurrences(of: "ń", with: "n")
-            .replacingOccurrences(of: "Ń", with: "N")
+        var ascii = text
+        for (key, value) in Self.map where ascii.contains(key) {
+            ascii = ascii.replacingOccurrences(of: key, with: value)
+        }
+        return ascii
     }
+        
     static func makeCamel(_ text: String) -> String {
         guard !text.isEmpty else { return "" }
         let parts = text.components(separatedBy: .alphanumerics.inverted)
