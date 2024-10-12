@@ -451,11 +451,16 @@ a:focus {
 }
 
 .btn-tag, .btn-tag:hover, .btn-tag:active, .btn-tag:visited {
-    background-color: #FFA500 !important;
+    background-color: #29A6A6 !important;
     text-decoration: none;
 }
 
 .btn-navi, .btn-navi:hover, .btn-navi:active, .btn-navi:visited {
-    background-color: #808000 !important;
+    background-color: #A52A2A !important;
+    color: #ffffff;
     text-decoration: none;
+}
+
+.tag {
+    color: #29A6A6;
 }

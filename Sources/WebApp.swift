@@ -121,7 +121,7 @@ class WebApp {
         return try response(posts: posts,
                             path: path,
                             title: "Jem na mieście - \(tag.name)" + (page > 0 ? " - strona \(page)" : ""),
-                            subtitle: "#\(tag.name)",
+                            tag: "#\(tag.name)",
                             previousPath: previousPath,
                             nextPath: nextPath)
     }
@@ -129,7 +129,7 @@ class WebApp {
     private func response(posts: [Post],
                           path: String,
                           title: String,
-                          subtitle: String? = nil,
+                          tag: String? = nil,
                           previousPath: String?,
                           nextPath: String?) throws -> CustomStringConvertible {
         let template = BootstrapTemplate()
@@ -161,8 +161,8 @@ class WebApp {
         if let nextPath = nextPath {
             body.assign(["url": nextPath], inNest: "next")
         }
-        if let subtitle = subtitle {
-            body.assign(["title": subtitle], inNest: "subtitle")
+        if let tag = tag {
+            body.assign(["title": tag], inNest: "tag")
         }
         template.body = body
         if posts.isEmpty.not {
