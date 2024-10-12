@@ -1,8 +1,19 @@
 <h1 class="h3 mb-4 text-gray-800">Wpisy</h1>
-
-
-[START post]
-<p>
-<a href="/admin?module=edit.post&postID={id}">{title}</a>
-</p>
-[END post]
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Data</th>
+      <th scope="col">Tytuł</th>
+    </tr>
+  </thead>
+  <tbody>
+    [START post]
+    <tr>
+      <th scope="row">{id}</th>
+      <td>{date}</td>
+      <td><a href="/admin?module=edit.post&postID={id}"> ➡ {title}</a></td>
+    </tr>
+    [END post]
+  </tbody>
+</table>
