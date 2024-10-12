@@ -10,11 +10,13 @@ class Photo: Codable {
     var id: Int64?
     var postID: Int64
     let filename: String
+    var sequence: Int
     
-    init(id: Int64? = nil, postID: Int64, filename: String) {
+    init(id: Int64? = nil, postID: Int64, filename: String, sequence: Int = 0) {
         self.id = id
         self.postID = postID
         self.filename = filename
+        self.sequence = sequence
     }
 }
 

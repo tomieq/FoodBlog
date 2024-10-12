@@ -16,6 +16,7 @@ class WebApp {
     let server = HttpServer()
     let db: Connection
     let postManager: PostManager
+    let photoManager: PhotoManager
     let tagManager: TagManager
     let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
     let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
@@ -29,6 +30,7 @@ class WebApp {
         
         self.db = db
         self.postManager = try PostManager(db: db)
+        self.photoManager = try PhotoManager(db: db)
         self.tagManager = try TagManager(db: db)
         
         print("Auth token: \(authToken)")
@@ -39,6 +41,7 @@ class WebApp {
                                       db: db,
                                       pageCache: pageCache,
                                       postManager: postManager,
+                                      photoManager: photoManager,
                                       tagManager: tagManager,
                                       adminPass: adminPass,
                                       authToken: authToken)
@@ -143,7 +146,7 @@ class WebApp {
         
         for post in posts {
             postTemplate.reset()
-            for photo in post.photos {
+            for photo in try photoManager.get(postID: post.id!) {
                 postTemplate.assign(["path": "/pics/\(photo.filename)"], inNest: "pic")
             }
             postTemplate["title"] = post.title

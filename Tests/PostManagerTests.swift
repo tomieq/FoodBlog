@@ -25,9 +25,18 @@ struct PostManagerTests {
         let photoIDs = try (1...3).compactMap { _ in try createPhoto().id }
         let post = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: photoIDs)
 
-        for photo in post.photos {
+        for photo in try PhotoTable.get(db: connection, ids: photoIDs) {
             #expect(photo.postID == post.id)
         }
+    }
+    
+    @Test func storingWithPhotoSequence() async throws {
+        _ = try (1...3).compactMap { _ in try createPhoto().id }
+        _ = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: [3, 1, 2])
+
+        #expect(try PhotoTable.get(db: connection, id: 3)?.sequence == 0)
+        #expect(try PhotoTable.get(db: connection, id: 1)?.sequence == 1)
+        #expect(try PhotoTable.get(db: connection, id: 2)?.sequence == 2)
     }
     
     @Test func pagination() async throws {

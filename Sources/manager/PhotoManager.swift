@@ -52,6 +52,10 @@ struct PhotoManager {
         return photo
     }
     
+    func get(postID: Int64) throws -> [Photo] {
+        try PhotoTable.get(db: db, postID: postID)
+    }
+    
     func remove(photoID: Int64) throws {
         guard let photo = try PhotoTable.get(db: db, id: photoID) else {
             return

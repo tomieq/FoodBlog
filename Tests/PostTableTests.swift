@@ -14,7 +14,6 @@ struct PostTableTests {
         let connection = try Connection(.inMemory)
         let date = Date()
         let post = Post(id: nil,
-                        photos: [],
                         title: "Nice title",
                         text: "Eating out is awesome!",
                         date: date)

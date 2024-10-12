@@ -22,11 +22,12 @@ class AdminServer {
          db: Connection,
          pageCache: PageCache,
          postManager: PostManager,
+         photoManager: PhotoManager,
          tagManager: TagManager,
          adminPass: String,
          authToken: String) throws {
 
-        self.photoManager = try PhotoManager(db: db)
+        self.photoManager = photoManager
         self.postManager = postManager
         self.tagManager = tagManager
         self.pageCache = pageCache
@@ -70,7 +71,8 @@ class AdminServer {
                 for post in try PostTable.get(db: db, limit: 100, offset: 0) {
                     module.assign([
                         "id": post.id!,
-                        "title": post.title
+                        "title": post.title,
+                        "date": post.date.readable
                     ], inNest: "post")
                 }
             case "edit.post":
@@ -104,7 +106,7 @@ class AdminServer {
             template.body = adminTemplate
             return .ok(.html(template))
         }
-        server.post["/admin/ajax_photo"] = { [unowned self] request, _ in
+        server.post["/admin/ajax_photo"] = { request, _ in
             guard let data = Data(base64Encoded: request.body.data) else {
                 return .badRequest(.text("wrong data"))
             }
@@ -143,6 +145,7 @@ class AdminServer {
             let photoIDs = ids.components(separatedBy: ",")
                 .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .compactMap { Int64($0)}
+            print(photoIDs)
             var updatedPost: Post!
             if let postID = request.formData.get("postID"), let id = Int64(postID), let post = try postManager.get(id: id) {
                 updatedPost = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs)
@@ -173,9 +176,9 @@ class AdminServer {
     
     private func editPostForm(_ post: Post, _ photos: [Photo]) throws -> Form {
         let form = Form(url: "/admin", method: "POST")
+        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "title", label: "Tytuł posta", value: post.title)
         form.addTextarea(name: "text", label: "Treść", value: post.text, rows: 10)
-        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
         let tags = try tagManager.getTags(postID: post.id!)
         form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
@@ -186,9 +189,9 @@ class AdminServer {
     
     private func addPostForm(_ photos: [Photo]) -> Form {
         let form = Form(url: "/admin", method: "POST")
+        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "title", label: "Tytuł posta")
         form.addTextarea(name: "text", label: "Treść", rows: 10)
-        form.addInputText(name: "pictureIDs", label: "ID zdjęć oddzielone przecinkami", value: photos.map{ "\($0.id!)" }.joined(separator: ","))
         form.addInputText(name: "date", label: "Data", value: Date().readable)
         form.addInputText(name: "tags", label: "Tagi", value: "")
         form.addSubmit(name: "add", label: "Opublikuj", style: .success)
