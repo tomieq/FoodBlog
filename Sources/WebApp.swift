@@ -73,7 +73,8 @@ class WebApp {
             .movedPermanently("/")
         }
         server.middleware.append( { request, header in
-            print("Request \(request.id) \(request.method) \(request.path) from \(request.peerName ?? "")")
+            let ip = request.headers.get("x-forwarded-for") ?? request.peerName ?? ""
+            print("Request \(request.id) \(request.method) \(request.path) from \(ip)")
             request.onFinished = { id, code, duration in
                 print("Request \(id) finished with \(code) in \(String(format: "%.3f", duration)) seconds")
             }
