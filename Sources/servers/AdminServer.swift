@@ -42,7 +42,7 @@ class AdminServer {
         server["/admin"] = { [unowned self] request, headers in
             if request.cookies.get("sid") != authToken {
                 _ = try digest.authorizedUser(request)
-                headers.setCookie(name: "sid", value: authToken, path: "/")
+                headers.setCookie(name: "sid", value: authToken, path: "/", cache: .days(7))
             }
             let moduleName = request.queryParams.get("module") ?? "welcome"
             let template = BootstrapTemplate()
