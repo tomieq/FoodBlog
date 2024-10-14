@@ -63,4 +63,15 @@ struct PostManager {
     func get(id: Int64) throws -> Post? {
         try PostTable.get(db: db, id: id)
     }
+    
+    func remove(id: Int64) throws {
+        let post = try get(id: id)
+        for photo in try PhotoTable.get(db: db, postID: id) {
+                photo.postID = 0
+                photo.sequence = 0
+                try PhotoTable.store(db: db, photo)
+        }
+        try TagConnectionTable.remove(db: db, postID: id)
+        try PostTable.remove(db: db, id: id)
+    }
 }

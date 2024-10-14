@@ -58,4 +58,8 @@ extension TagConnectionTable {
         guard ids.isEmpty.not else { return }
         try db.run(table.filter(ids.contains(Self.id)).delete())
     }
+    
+    static func remove(db: Connection, postID: Int64) throws {
+        try db.run(table.filter(Self.postID == postID).delete())
+    }
 }

@@ -14,11 +14,13 @@ struct PostManagerTests {
     let connection: Connection
     let photoManager: PhotoManager
     let postManager: PostManager
+    let tagManager: TagManager
     
     init() throws {
         connection = try Connection(.inMemory)
         photoManager = try PhotoManager(db: connection)
         postManager = try PostManager(db: connection)
+        tagManager = try TagManager(db: connection)
     }
     
     @Test func storing() async throws {
@@ -51,6 +53,20 @@ struct PostManagerTests {
         #expect(page1.count == 5)
         #expect(page1.map{ $0.title }.contains("Post 15"))
         #expect(page1.map{ $0.title }.contains("Post 11"))
+    }
+    
+    @Test func removal() async throws {
+        _ = try (1...3).compactMap { _ in try createPhoto().id }
+        _ = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: [3, 1, 2])
+        _ = try tagManager.assignTagsToPost(names: ["Tasty", "cheap"], postID: 1)
+        
+        #expect(try PhotoTable.get(db: connection, postID: 1).count == 3)
+        #expect(try TagConnectionTable.get(db: connection, postID: 1).count == 2)
+        
+        try postManager.remove(id: 1)
+        
+        #expect(try PhotoTable.get(db: connection, postID: 1).count == 0)
+        #expect(try TagConnectionTable.get(db: connection, postID: 1).count == 0)
     }
     
     func createPhoto() throws -> Photo {

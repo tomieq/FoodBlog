@@ -59,6 +59,7 @@ class AdminServer {
             
             storePhotoIfNeeded(request)
             try deletePhotoIfNeeded(request)
+            try deletePostfNeeded(request)
             try flipPhotoIfNeeded(request)
             try publishPostIfNeeded(request)
 
@@ -177,6 +178,18 @@ class AdminServer {
                                                          tagIDs: [],
                                                          isOnMainStory: false))
             }
+        }
+    }
+    
+    private func deletePostfNeeded(_ request: HttpRequest) throws {
+        // delete post
+        if let deleteID = request.queryParams.get("removePostID"), let postID = Int64(deleteID) {
+            let modifiedTags = try tagManager.getTags(postID: postID).compactMap { $0.id }
+            try postManager.remove(id: postID)
+            pageCache.invalidate(meta: CacheMetaData(postIDs: [postID],
+                                                     photoIDs: [],
+                                                     tagIDs: modifiedTags,
+                                                     isOnMainStory: true))
         }
     }
     

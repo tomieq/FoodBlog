@@ -5,6 +5,7 @@
       <th scope="col">#</th>
       <th scope="col">Data</th>
       <th scope="col">Tytuł</th>
+      <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
@@ -13,6 +14,7 @@
       <th scope="row">{id}</th>
       <td>{date}</td>
       <td><a href="/admin?module=edit.post&postID={id}"> ➡ {title}</a></td>
+      <td><a href="/admin?module=posts&removePostID={id}" class="btn btn-sm btn-danger">Delete</a></td>
     </tr>
     [END post]
   </tbody>
