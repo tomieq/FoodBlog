@@ -69,6 +69,13 @@ struct PostManagerTests {
         #expect(try TagConnectionTable.get(db: connection, postID: 1).count == 0)
     }
     
+    @Test func amount() async throws {
+        for i in 1...20 {
+            _ = try postManager.store(title: "Post \(i)", text: "Content \(i)", date: Date(), photoIDs: [])
+        }
+        #expect(try postManager.amount() == 20)
+    }
+
     func createPhoto() throws -> Photo {
         let photo = Photo(postID: 0, filename: UUID().uuidString + ".jpg")
         try PhotoTable.store(db: connection, photo)

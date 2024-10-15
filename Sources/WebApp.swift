@@ -90,13 +90,14 @@ class WebApp {
         if let cached = pageCache.page(path) {
             return cached
         }
+        let amount = try postManager.amount()
         let posts = try postManager.list(limit: postsPerPage, page: page)
         var previousPath: String? = nil
         var nextPath: String? = nil
         if page > 0 {
             previousPath = page == 1 ? "/" : "/strona/\(page - 1)"
         }
-        if posts.count == postsPerPage {
+        if (page + 1) * postsPerPage < amount {
             nextPath = "/strona/\(page + 1)"
         }
 
@@ -118,7 +119,7 @@ class WebApp {
         if page > 0 {
             previousPath = page == 1 ? "/tag/\(tag.seoName)" : "/tag/\(tag.seoName)/\(page - 1)"
         }
-        if posts.count == postsPerPage {
+        if (page + 1) * postsPerPage < postIDs.count {
             nextPath = "/tag/\(tag.seoName)/\(page + 1)"
         }
 

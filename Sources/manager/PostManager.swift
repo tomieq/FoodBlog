@@ -52,6 +52,10 @@ struct PostManager {
         return updatedPost
     }
     
+    func amount() throws -> Int {
+        try PostTable.amount(db: db)
+    }
+
     func list(limit: Int, page: Int) throws -> [Post] {
         try PostTable.get(db: db, limit: limit, offset: limit * page)
     }

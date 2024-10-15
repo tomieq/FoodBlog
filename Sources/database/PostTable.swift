@@ -46,6 +46,10 @@ extension PostTable {
         }
     }
 
+    static func amount(db: Connection) throws -> Int {
+        try db.scalar(table.count)
+    }
+
     static func get(db: Connection, id: Int64) throws -> Post? {
         if let row = try db.pluck(table.filter(Self.id == id)) {
             return Post(id: row[Self.id],
