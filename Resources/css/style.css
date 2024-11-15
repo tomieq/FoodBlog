@@ -465,11 +465,11 @@ a:focus {
 }
 
 .btn-tag-restaurantName, .btn-tag-restaurantName:hover, .btn-tag-restaurantName:active, .btn-tag-restaurantName:visited {
-    background-color: #800000 !important;
-    color: #FFFFFF;
+    background-color: #ECDF8C !important;
+    color: #0E0E0E;
 }
 
 .btn-tag-mealName, .btn-tag-mealName:hover, .btn-tag-mealName:active, .btn-tag-mealName:visited {
     background-color: #EB9100 !important;
-    color: #000000;
+    color: #0E0E0E;
 }
