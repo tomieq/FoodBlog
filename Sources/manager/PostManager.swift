@@ -15,10 +15,15 @@ struct PostManager {
         try PostTable.create(db: db)
     }
     
-    func store(title: String, text: String, date: Date, photoIDs: [Int64]) throws -> Post {
+    func store(title: String,
+               text: String,
+               date: Date,
+               photoIDs: [Int64],
+               mealPrice: Double?) throws -> Post {
         let post = Post(title: title,
                         text: text,
-                        date: date)
+                        date: date,
+                        mealPrice: mealPrice)
         try PostTable.store(db: db, post)
         for photo in try PhotoTable.get(db: db, ids: photoIDs) {
             photo.postID = post.id!
@@ -28,11 +33,17 @@ struct PostManager {
         return post
     }
     
-    func update(_ post: Post, title: String, text: String, date: Date, photoIDs: [Int64]) throws -> Post {
+    func update(_ post: Post,
+                title: String,
+                text: String,
+                date: Date,
+                photoIDs: [Int64],
+                mealPrice: Double?) throws -> Post {
         let updatedPost = Post(id: post.id,
                                title: title,
                                text: text,
-                               date: date)
+                               date: date,
+                               mealPrice: mealPrice)
         try PostTable.store(db: db, updatedPost)
         // unassign
         for photo in try PhotoTable.get(db: db, postID: post.id!) where photoIDs.contains(photo.id!).not {

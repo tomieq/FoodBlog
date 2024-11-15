@@ -14,6 +14,7 @@ enum PostTable {
     static let title = SQLite.Expression<String>("title")
     static let text = SQLite.Expression<String>("text")
     static let date = SQLite.Expression<Double>("date")
+    static let mealPrice = SQLite.Expression<Double?>("mealPrice")
 }
 
 extension PostTable {
@@ -25,6 +26,7 @@ extension PostTable {
             t.column(date)
         })
         try db.run(table.createIndex(date, ifNotExists: true))
+        _ = try? db.run(table.addColumn(mealPrice, defaultValue: nil))
     }
     
     static func store(db: Connection, _ post: Post) throws {
@@ -32,14 +34,16 @@ extension PostTable {
             try db.run(table.filter(id == rowID).update(
                 title <- post.title,
                 text <- post.text,
-                date <- post.date.timeIntervalSince1970
+                date <- post.date.timeIntervalSince1970,
+                mealPrice <- post.mealPrice
             ))
             print("Updated \(post.json)")
         } else {
             let id = try db.run(table.insert(
                 title <- post.title,
                 text <- post.text,
-                date <- post.date.timeIntervalSince1970
+                date <- post.date.timeIntervalSince1970,
+                mealPrice <- post.mealPrice
             ))
             post.id = id
             print("Inserted \(post.json)")
@@ -55,7 +59,8 @@ extension PostTable {
             return Post(id: row[Self.id],
                         title: row[Self.title],
                         text: row[Self.text],
-                        date: Date(timeIntervalSince1970: row[Self.date]))
+                        date: Date(timeIntervalSince1970: row[Self.date]),
+                        mealPrice: row[Self.mealPrice])
         }
         return nil
     }
@@ -66,7 +71,8 @@ extension PostTable {
             result.append(Post(id: row[Self.id],
                                title: row[Self.title],
                                text: row[Self.text],
-                               date: Date(timeIntervalSince1970: row[Self.date])))
+                               date: Date(timeIntervalSince1970: row[Self.date]),
+                               mealPrice: row[Self.mealPrice]))
         }
         return result
     }
@@ -77,7 +83,8 @@ extension PostTable {
             result.append(Post(id: row[Self.id],
                                title: row[Self.title],
                                text: row[Self.text],
-                               date: Date(timeIntervalSince1970: row[Self.date])))
+                               date: Date(timeIntervalSince1970: row[Self.date]),
+                               mealPrice: row[Self.mealPrice]))
         }
         return result
     }

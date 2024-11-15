@@ -452,6 +452,7 @@ a:focus {
 .btn-tag, .btn-tag:hover, .btn-tag:active, .btn-tag:visited {
     background-color: #29A6A6 !important;
     text-decoration: none;
+    margin-bottom: 3px;
 }
 
 .btn-navi, .btn-navi:hover, .btn-navi:active, .btn-navi:visited {

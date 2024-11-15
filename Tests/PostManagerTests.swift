@@ -25,7 +25,11 @@ struct PostManagerTests {
     
     @Test func storing() async throws {
         let photoIDs = try (1...3).compactMap { _ in try createPhoto().id }
-        let post = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: photoIDs)
+        let post = try postManager.store(title: "New post",
+                                         text: "Awesome food!",
+                                         date: Date(),
+                                         photoIDs: photoIDs,
+                                         mealPrice: 29)
 
         for photo in try PhotoTable.get(db: connection, ids: photoIDs) {
             #expect(photo.postID == post.id)
@@ -34,7 +38,11 @@ struct PostManagerTests {
     
     @Test func storingWithPhotoSequence() async throws {
         _ = try (1...3).compactMap { _ in try createPhoto().id }
-        _ = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: [3, 1, 2])
+        _ = try postManager.store(title: "New post",
+                                  text: "Awesome food!",
+                                  date: Date(),
+                                  photoIDs: [3, 1, 2],
+                                  mealPrice: 29)
 
         #expect(try PhotoTable.get(db: connection, id: 3)?.sequence == 0)
         #expect(try PhotoTable.get(db: connection, id: 1)?.sequence == 1)
@@ -43,7 +51,11 @@ struct PostManagerTests {
     
     @Test func pagination() async throws {
         for i in 1...20 {
-            _ = try postManager.store(title: "Post \(i)", text: "Content \(i)", date: Date(), photoIDs: [])
+            _ = try postManager.store(title: "Post \(i)",
+                                      text: "Content \(i)",
+                                      date: Date(),
+                                      photoIDs: [],
+                                      mealPrice: 29)
         }
         let page0 = try postManager.list(limit: 5, page: 0)
         #expect(page0.count == 5)
@@ -57,7 +69,11 @@ struct PostManagerTests {
     
     @Test func removal() async throws {
         _ = try (1...3).compactMap { _ in try createPhoto().id }
-        _ = try postManager.store(title: "New post", text: "Awesome food!", date: Date(), photoIDs: [3, 1, 2])
+        _ = try postManager.store(title: "New post",
+                                  text: "Awesome food!",
+                                  date: Date(),
+                                  photoIDs: [3, 1, 2],
+                                  mealPrice: 29)
         _ = try tagManager.assignTagsToPost(names: ["Tasty", "cheap"], postID: 1)
         
         #expect(try PhotoTable.get(db: connection, postID: 1).count == 3)
@@ -71,7 +87,11 @@ struct PostManagerTests {
     
     @Test func amount() async throws {
         for i in 1...20 {
-            _ = try postManager.store(title: "Post \(i)", text: "Content \(i)", date: Date(), photoIDs: [])
+            _ = try postManager.store(title: "Post \(i)",
+                                      text: "Content \(i)",
+                                      date: Date(),
+                                      photoIDs: [],
+                                      mealPrice: 29)
         }
         #expect(try postManager.amount() == 20)
     }

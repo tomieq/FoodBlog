@@ -142,7 +142,7 @@ class WebApp {
                           nextPath: String?) throws -> CustomStringConvertible {
         let template = BootstrapTemplate()
         template.title = title
-        template.addCSS(url: "/css/style.css?v=2.3")
+        template.addCSS(url: "/css/style.css?v=2.5")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
@@ -162,6 +162,9 @@ class WebApp {
             postTemplate["date"] = post.date.readable
             postTemplate["postID"] = post.id
             postTemplate["tags"] = tagWidget.html(tags: try tagManager.getTags(postID: post.id!))
+            if let price = post.mealPrice {
+                postTemplate["mealPrice"] = "\(price.price) PLN"
+            }
             body.assign(["content": postTemplate], inNest: "post")
         }
         if let previousPath = previousPath {

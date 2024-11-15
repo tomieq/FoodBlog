@@ -11,11 +11,17 @@ class Post: Codable {
     let title: String
     let text: String
     let date: Date
+    let mealPrice: Double?
     
-    init(id: Int64? = nil, title: String, text: String, date: Date) {
+    init(id: Int64? = nil,
+         title: String,
+         text: String,
+         date: Date,
+         mealPrice: Double?) {
         self.id = id
         self.title = title
         self.text = text
         self.date = date
+        self.mealPrice = mealPrice
     }
 }
