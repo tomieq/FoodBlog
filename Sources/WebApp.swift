@@ -104,6 +104,7 @@ class WebApp {
         return try response(posts: posts,
                             path: path,
                             title: "Jem na mieście" + (page > 0 ? " - strona \(page)" : ""),
+                            subtitle: "Kulinarne relacje<br>Smacznie? Tanio? Sprawdzam!",
                             previousPath: previousPath,
                             nextPath: nextPath)
     }
@@ -125,8 +126,9 @@ class WebApp {
 
         return try response(posts: posts,
                             path: path,
-                            title: "Jem na mieście - \(tag.name)" + (page > 0 ? " - strona \(page)" : ""),
-                            tag: "#\(tag.name)",
+                            title: "\(tag.pageTitle) - \(tag.name)" + (page > 0 ? " - strona \(page)" : ""),
+                            subtitle: tag.pageTitle,
+                            tag: "\(tag.icon) \(tag.name)",
                             previousPath: previousPath,
                             nextPath: nextPath)
     }
@@ -134,12 +136,13 @@ class WebApp {
     private func response(posts: [Post],
                           path: String,
                           title: String,
+                          subtitle: String,
                           tag: String? = nil,
                           previousPath: String?,
                           nextPath: String?) throws -> CustomStringConvertible {
         let template = BootstrapTemplate()
         template.title = title
-        template.addCSS(url: "/css/style.css?v=3")
+        template.addCSS(url: "/css/style.css?v=5")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
@@ -173,6 +176,7 @@ class WebApp {
         if let tag = tag {
             body.assign(["title": tag], inNest: "tag")
         }
+        body["subtitle"] = subtitle
         template.body = body
         if posts.isEmpty.not {
             let meta = CacheMetaData(postIDs: posts.compactMap { $0.id },
