@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap");
 body {
   font-family: "Open Sans", sans-serif;
   color: #ffffff;
@@ -32,7 +31,7 @@ body {
 
 h1,
 h2, h3, h4 {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Verdana', cursive;
 }
 
 .readableFont {
@@ -153,7 +152,7 @@ a:focus {
 }
 
 .navbar-brand {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Verdana', cursive;
 }
 
 .navbar-brand span {
@@ -359,7 +358,7 @@ a:focus {
 .footer_section .footer-logo {
   font-weight: 600;
   margin-bottom: 20px;
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Verdana', cursive;
 }
 
 .footer_section p {
