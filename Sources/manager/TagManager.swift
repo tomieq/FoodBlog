@@ -60,6 +60,18 @@ class TagManager {
         try TagTable.get(db: db, seoName: seoName)
     }
     
+    func update(currentSeoName: String, tag updatedTag: Tag) throws -> Int64? {
+        guard let currentTag = try? TagTable.get(db: db, seoName: currentSeoName) else {
+            return nil
+        }
+        let tag = Tag(id: currentTag.id,
+                      name: updatedTag.name,
+                      seoName: updatedTag.name.seo,
+                      type: updatedTag.type)
+        try TagTable.store(db: db, tag)
+        return tag.id
+    }
+    
     var all: [Tag] {
         get throws {
             try TagTable.all(db: db)

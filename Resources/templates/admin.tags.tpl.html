@@ -1,0 +1,24 @@
+
+<h1 class="h3 mb-4 text-gray-800">Tagi</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Nazwa</th>
+      <th scope="col">Seo</th>
+      <th scope="col">Typ</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    [START tag]
+    <tr>
+      <th scope="row">{id}</th>
+      <td>{icon} <a href="/admin?module=edit.tag&seoName={seoName}">{name}</a></td>
+      <td>{seoName}</td>
+      <td>{typeName}</td>
+      <td><a href="/admin?module=tags&removeTagID={id}" class="btn btn-sm btn-danger">Delete</a></td>
+    </tr>
+    [END tag]
+  </tbody>
+</table>

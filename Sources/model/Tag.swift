@@ -5,7 +5,7 @@
 //  Created by Tomasz on 30/09/2024.
 //
 
-enum TagType: Int, Codable {
+enum TagType: Int, Codable, CaseIterable {
     case standard
     case restaurantName
     case mealName

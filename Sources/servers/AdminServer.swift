@@ -62,6 +62,7 @@ class AdminServer {
             try deletePostfNeeded(request)
             try flipPhotoIfNeeded(request)
             try publishPostIfNeeded(request)
+            try updateTagIfNeeded(request)
 
             let adminTemplate = Template.cached(relativePath: "templates/admin.tpl.html")
             
@@ -93,6 +94,22 @@ class AdminServer {
                 assignThumbnails(photos, module, postID: 0)
                 module["form"] = addPostForm(photos)
                 try addFormJavaScript()
+            case "tags":
+                module = Template.cached(relativePath: "templates/admin.tags.tpl.html")
+                for tag in try tagManager.all {
+                    module.assign([
+                        "id": tag.id!,
+                        "name": tag.name,
+                        "icon": tag.icon,
+                        "seoName": tag.seoName
+                    ], inNest: "tag")
+                }
+            case "edit.tag":
+                module = Template.cached(relativePath: "templates/admin.edit.tag.tpl.html")
+                guard let tag = try  tagManager.get(seoName: request.queryParams.get("seoName") ?? "") else {
+                    return .movedTemporarily("/admin?module=tags")
+                }
+                module["form"] = try editTagForm(tag)
             case "backup":
                 module = Template.cached(relativePath: "templates/admin.backup.tpl.html")
             case "photos":
@@ -200,6 +217,21 @@ class AdminServer {
         }
     }
     
+    private func updateTagIfNeeded(_ request: HttpRequest) throws {
+        if let tagSeoName = request.formData.get("seoName"),
+           let name = request.formData.get("name"),
+           let type = request.formData.get("type")?.int {
+
+            let tag = Tag(name: name, seoName: name.seo, type: TagType(rawValue: type) ?? .standard)
+            if let tagID = try tagManager.update(currentSeoName: tagSeoName, tag: tag) {
+                pageCache.invalidate(meta: CacheMetaData(postIDs: [],
+                                                         photoIDs: [],
+                                                         tagIDs: [tagID],
+                                                         isOnMainStory: false))
+            }
+        }
+    }
+    
     private func editPostForm(_ post: Post, _ photos: [Photo]) throws -> Form {
         let form = Form(url: "/admin", method: "POST")
         form.addInputText(name: "pictureIDs",
@@ -228,6 +260,15 @@ class AdminServer {
         form.addInputText(name: "date", label: "Data", value: Date().readable)
         form.addInputText(name: "tags", label: "Tagi", value: "")
         form.addSubmit(name: "add", label: "Opublikuj", style: .success)
+        return form
+    }
+    
+    private func editTagForm(_ tag: Tag) throws -> Form {
+        let form = Form(url: "/admin?module=tags", method: "POST")
+        form.addInputText(name: "name", label: "Nazwa", value: tag.name)
+        form.addRadio(name: "type", label: "Typ", options: TagType.allCases.map { FormRadioModel(label: "\($0)", value: "\($0.rawValue)") }, checked: "\(tag.type.rawValue)")
+        form.addHidden(name: "seoName", value: tag.seoName)
+        form.addSubmit(name: "add", label: "Aktualizuj", style: .success)
         return form
     }
 }
