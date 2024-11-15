@@ -161,7 +161,9 @@ class WebApp {
             postTemplate["text"] = post.text
             postTemplate["date"] = post.date.readable
             postTemplate["postID"] = post.id
-            postTemplate["tags"] = tagWidget.html(tags: try tagManager.getTags(postID: post.id!))
+            let postTags = try tagManager.getTags(postID: post.id!)
+            visibleTagIDs.append(contentsOf: postTags.compactMap{ $0.id })
+            postTemplate["tags"] = tagWidget.html(tags: postTags)
             if let price = post.mealPrice {
                 postTemplate["mealPrice"] = "\(price.price) PLN"
             }
