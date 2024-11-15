@@ -222,7 +222,7 @@ class AdminServer {
            let name = request.formData.get("name"),
            let type = request.formData.get("type")?.int {
 
-            let tag = Tag(name: name, seoName: name.seo, type: TagType(rawValue: type) ?? .standard)
+            let tag = Tag(name: name, seoName: name.seo, tagType: TagType(rawValue: type) ?? .standard)
             if let tagID = try tagManager.update(currentSeoName: tagSeoName, tag: tag) {
                 pageCache.invalidate(meta: CacheMetaData(postIDs: [],
                                                          photoIDs: [],
@@ -266,7 +266,7 @@ class AdminServer {
     private func editTagForm(_ tag: Tag) throws -> Form {
         let form = Form(url: "/admin?module=tags", method: "POST")
         form.addInputText(name: "name", label: "Nazwa", value: tag.name)
-        form.addRadio(name: "type", label: "Typ", options: TagType.allCases.map { FormRadioModel(label: "\($0)", value: "\($0.rawValue)") }, checked: "\(tag.type.rawValue)")
+        form.addRadio(name: "type", label: "Typ", options: TagType.allCases.map { FormRadioModel(label: "\($0)", value: "\($0.rawValue)") }, checked: "\(tag.tagType.rawValue)")
         form.addHidden(name: "seoName", value: tag.seoName)
         form.addSubmit(name: "add", label: "Aktualizuj", style: .success)
         return form

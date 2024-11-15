@@ -5,9 +5,9 @@
 //  Created by Tomasz on 15/11/2024.
 //
 
-extension Tag {
+extension TagType {
     var icon: String {
-        switch type {
+        switch self {
         case .standard:
             "#"
         case .restaurantName:
@@ -16,8 +16,14 @@ extension Tag {
             "🍲"
         }
     }
+}
+
+extension Tag {
+    var icon: String {
+        self.tagType.icon
+    }
     var pageTitle: String {
-        switch type {
+        switch tagType {
         case .standard:
             "Jem na mieście"
         case .restaurantName:

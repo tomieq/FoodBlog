@@ -15,15 +15,15 @@ class Tag: Codable {
     var id: Int64?
     let name: String
     let seoName: String
-    let type: TagType
+    let tagType: TagType
     
     init(id: Int64? = nil,
          name: String,
          seoName: String,
-         type: TagType) {
+         tagType: TagType) {
         self.id = id
         self.name = name
         self.seoName = seoName
-        self.type = type
+        self.tagType = tagType
     }
 }

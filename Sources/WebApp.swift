@@ -142,13 +142,13 @@ class WebApp {
                           nextPath: String?) throws -> CustomStringConvertible {
         let template = BootstrapTemplate()
         template.title = title
-        template.addCSS(url: "/css/style.css?v=5")
+        template.addCSS(url: "/css/style.css?v=2.3")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
         let body = Template.cached(relativePath: "templates/body.tpl.html")
         let postTemplate = Template.cached(relativePath: "templates/post.tpl.html")
-        
+        let tagWidget = TagWidget()
         var visiblePhotoIDs: [Int64] = []
         var visibleTagIDs: [Int64] = []
         for post in posts {
@@ -161,10 +161,7 @@ class WebApp {
             postTemplate["text"] = post.text
             postTemplate["date"] = post.date.readable
             postTemplate["postID"] = post.id
-            try tagManager.getTags(postID: post.id!).forEach {
-                postTemplate.assign($0, inNest: "tag")
-                visibleTagIDs.append($0.id!)
-            }
+            postTemplate["tags"] = tagWidget.html(tags: try tagManager.getTags(postID: post.id!))
             body.assign(["content": postTemplate], inNest: "post")
         }
         if let previousPath = previousPath {

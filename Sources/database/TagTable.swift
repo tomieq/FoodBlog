@@ -33,14 +33,14 @@ extension TagTable {
             try db.run(table.filter(id == rowID).update(
                 name <- tag.name,
                 seoName <- tag.seoName,
-                tagType <- tag.type.rawValue
+                tagType <- tag.tagType.rawValue
             ))
             print("Updated tag \(tag.json)")
         } else {
             let id = try db.run(table.insert(
                 name <- tag.name,
                 seoName <- tag.seoName,
-                tagType <- tag.type.rawValue
+                tagType <- tag.tagType.rawValue
             ))
             tag.id = id
             print("Inserted tag \(tag.json)")
@@ -53,7 +53,7 @@ extension TagTable {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
                               seoName: row[Self.seoName],
-                              type: TagType(rawValue: row[Self.tagType])!
+                              tagType: TagType(rawValue: row[Self.tagType])!
                              ))
         }
         return result
@@ -65,7 +65,7 @@ extension TagTable {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
                               seoName: row[Self.seoName],
-                              type: TagType(rawValue: row[Self.tagType])!))
+                              tagType: TagType(rawValue: row[Self.tagType])!))
         }
         return result
     }
@@ -75,7 +75,7 @@ extension TagTable {
             return Tag(id: row[Self.id],
                        name: row[Self.name],
                        seoName: row[Self.seoName],
-                       type: TagType(rawValue: row[Self.tagType])!)
+                       tagType: TagType(rawValue: row[Self.tagType])!)
         }
         return nil
     }
@@ -86,7 +86,7 @@ extension TagTable {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
                               seoName: row[Self.seoName],
-                              type: TagType(rawValue: row[Self.tagType])!))
+                              tagType: TagType(rawValue: row[Self.tagType])!))
         }
         return result
     }
