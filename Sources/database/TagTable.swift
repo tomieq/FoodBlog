@@ -13,6 +13,7 @@ enum TagTable {
     static let id = SQLite.Expression<Int64>("id")
     static let name = SQLite.Expression<String>("name")
     static let seoName = SQLite.Expression<String>("seoName")
+    static let tagType = SQLite.Expression<Int>("type")
 }
 
 extension TagTable {
@@ -24,19 +25,22 @@ extension TagTable {
         })
         try db.run(table.createIndex(name, ifNotExists: true))
         try db.run(table.createIndex(seoName, ifNotExists: true))
+        _ = try? db.run(table.addColumn(tagType, defaultValue: 0))
     }
     
     static func store(db: Connection, _ tag: Tag) throws {
         if let rowID = tag.id {
             try db.run(table.filter(id == rowID).update(
                 name <- tag.name,
-                seoName <- tag.seoName
+                seoName <- tag.seoName,
+                tagType <- tag.type.rawValue
             ))
             print("Updated tag \(tag.json)")
         } else {
             let id = try db.run(table.insert(
                 name <- tag.name,
-                seoName <- tag.seoName
+                seoName <- tag.seoName,
+                tagType <- tag.type.rawValue
             ))
             tag.id = id
             print("Inserted tag \(tag.json)")
@@ -48,7 +52,9 @@ extension TagTable {
         for row in try db.prepare(table.filter(names.contains(name))) {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
-                              seoName: row[Self.seoName]))
+                              seoName: row[Self.seoName],
+                              type: TagType(rawValue: row[Self.tagType])!
+                             ))
         }
         return result
     }
@@ -58,7 +64,8 @@ extension TagTable {
         for row in try db.prepare(table.filter(ids.contains(id))) {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
-                              seoName: row[Self.seoName]))
+                              seoName: row[Self.seoName],
+                              type: TagType(rawValue: row[Self.tagType])!))
         }
         return result
     }
@@ -67,7 +74,8 @@ extension TagTable {
         if let row = try db.pluck(table.filter(Self.seoName == seoName)) {
             return Tag(id: row[Self.id],
                        name: row[Self.name],
-                       seoName: row[Self.seoName])
+                       seoName: row[Self.seoName],
+                       type: TagType(rawValue: row[Self.tagType])!)
         }
         return nil
     }
@@ -77,7 +85,8 @@ extension TagTable {
         for row in try db.prepare(table) {
             result.append(Tag(id: row[Self.id],
                               name: row[Self.name],
-                              seoName: row[Self.seoName]))
+                              seoName: row[Self.seoName],
+                              type: TagType(rawValue: row[Self.tagType])!))
         }
         return result
     }
