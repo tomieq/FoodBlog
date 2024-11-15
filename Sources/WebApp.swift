@@ -160,6 +160,7 @@ class WebApp {
             postTemplate["title"] = post.title
             postTemplate["text"] = post.text
             postTemplate["date"] = post.date.readable
+            postTemplate["dayOfWeek"] = post.date.dayOfWeek
             postTemplate["postID"] = post.id
             let postTags = try tagManager.getTags(postID: post.id!)
             visibleTagIDs.append(contentsOf: postTags.compactMap{ $0.id })

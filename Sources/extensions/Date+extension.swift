@@ -24,3 +24,21 @@ extension Date {
         return dateFormatter.date(from:text)
     }
 }
+
+extension Date {
+    var dayOfWeek: String {
+        let calendar = Calendar(identifier: .gregorian)
+        let weekday = calendar.component(.weekday, from: self)
+        
+        switch weekday {
+        case 1: return "Niedziela"
+        case 2: return "Poniedziałek"
+        case 3: return "Wtorek"
+        case 4: return "Środa"
+        case 5: return "Czwartek"
+        case 6: return "Piątek"
+        case 7: return "Sobota"
+        default: return "Nieznany dzień"
+        }
+    }
+}
