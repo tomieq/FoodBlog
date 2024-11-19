@@ -11,6 +11,7 @@ docker run -d --restart always -p 8085:80 \
     --name awstats \
     --volume food_volume:/food_volume:ro \
     --volume awstats_storage:/awstats_storage \
+    --env TZ="Europe/Warsaw" \
     tomieq/awstats:1.0
 
 # ensure awstats can read your logs
@@ -20,6 +21,8 @@ docker exec awstats awstats_updateall.pl now
 
 Add this line to your `/etc/crontab` to let Awstats analyze your logs every 10 minutes:
 
+
+Run `crontab -e` adding entry:
 ```
 */10 * * * * root docker exec awstats awstats_updateall.pl now > /dev/null
 ```
