@@ -17,7 +17,7 @@ class BackupServer {
                 try? FileManager.default.removeItem(atPath: backupPath)
                 let dbPath = Volume.path + "storage.db"
                 shell.exec("rm foodBlogBackup.tar")
-                print(shell.exec("COPYFILE_DISABLE=1 tar czvf foodBlogBackup.tar \(Volume.picsPath) \(Volume.thumbsPath) \(dbPath)"))
+                print(shell.exec("COPYFILE_DISABLE=1 tar czvf foodBlogBackup.tar \(Volume.picsPath) \(Volume.thumbsPath) \(Volume.logsPath) \(dbPath)"))
             }
             return .ok(.js(JSCode.showInfo("Started generating backup")))
         }
