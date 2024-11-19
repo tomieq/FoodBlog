@@ -10,4 +10,5 @@ enum Volume {
     static let path: String = FileManager.default.currentDirectoryPath + "/volume/"
     static let picsPath = Self.path + "pics/"
     static let thumbsPath = Self.path + "thumbs/"
+    static let logsPath = Self.path + "access_logs/"
 }

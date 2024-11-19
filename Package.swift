@@ -7,7 +7,7 @@ let package = Package(
     name: "FoodBlog",
     dependencies: [
         .package(url: "https://github.com/tomieq/BootstrapStarter", revision: "66b1a61"),
-        .package(url: "https://github.com/tomieq/swifter", .upToNextMajor(from: "2.1.0")),
+        .package(url: "https://github.com/tomieq/swifter", branch: "develop"),
         .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0"),
         .package(url: "https://github.com/twostraws/SwiftGD", branch: "main"),
         .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.15.3")

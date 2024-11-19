@@ -74,9 +74,14 @@ class WebApp {
         }
         server.middleware.append( { request, header in
             let ip = request.headers.get("x-forwarded-for") ?? request.peerName ?? ""
-            print("Request \(request.id) \(request.method) \(request.path) from \(ip)")
-            request.onFinished = { id, code, duration in
-                print("Request \(id) finished with \(code) in \(String(format: "%.3f", duration)) seconds")
+            let method = request.method.rawValue
+            let path = request.path
+            let agent = request.headers.get("user-agent") ?? ""
+            let referer = request.headers.get("referer") ?? ""
+            
+            request.onFinished = { summary in
+                // awstat format: %host %time2 %method %url %uaquot %code %bytesd %refererquot
+                FileLogger.shared.log("\(ip) \(Date().log) \(method) \(path) \"\(agent)\" \(summary.responseCode) \(summary.responseSizeInBytes) \"\(referer)\"\n")
             }
             return nil
         })
