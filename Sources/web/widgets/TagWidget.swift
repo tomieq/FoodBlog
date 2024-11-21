@@ -28,7 +28,7 @@ class TagWidget {
             template["label"] = label
             for tag in tags {
                 template.assign(["name": tag.name,
-                                 "seoName": tag.seoName,
+                                 "webLink": tag.webLink,
                                  "tagType": "\(tag.tagType)"], inNest: "tag")
             }
             return template.output
