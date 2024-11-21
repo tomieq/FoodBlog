@@ -223,7 +223,7 @@ class AdminServer {
            let name = request.formData.get("name"),
            let type = request.formData.get("type")?.int {
 
-            let tag = Tag(name: name, seoName: name.seo, tagType: TagType(rawValue: type) ?? .standard)
+            let tag = Tag(name: name, seoName: name.camelCase, tagType: TagType(rawValue: type) ?? .standard)
             if let tagID = try tagManager.update(currentSeoName: tagSeoName, tag: tag) {
                 pageCache.invalidate(meta: CacheMetaData(postIDs: [],
                                                          photoIDs: [],

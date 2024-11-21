@@ -42,14 +42,30 @@ struct SeoConverter {
 
         return ([first] + rest).joined()
     }
+    
+    static func makeDashed(_ text: String) -> String {
+        guard !text.isEmpty else { return "" }
+        let parts = text.components(separatedBy: .alphanumerics.inverted)
+        return parts.map{ $0.lowercased() }
+            .filter { $0.isEmpty.not }
+            .joined(separator: "-")
+    }
 }
 
 extension String {
-    var seo: String {
+    var camelCase: String {
         SeoConverter.asciiString(self).cameled
     }
     
     private var cameled: String {
         SeoConverter.makeCamel(self)
+    }
+    
+    var seoLink: String {
+        SeoConverter.asciiString(self).dashJoined + ".html"
+    }
+    
+    private var dashJoined: String {
+        SeoConverter.makeDashed(self)
     }
 }
