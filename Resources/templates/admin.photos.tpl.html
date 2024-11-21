@@ -6,6 +6,12 @@
 <hr>
 <b>Prześlij przeskalowane</b>
 <p>
+    <select id="photoType">
+        [START photoType]
+        <option value="{value}">{name}</option>
+        [END photoType]
+    </select>
+    <br><br>
     <input id="photo" type="file" accept="image/*" onchange="handleFiles()">
 </p>
 <hr>
@@ -17,6 +23,7 @@
   <div class="col col-6 col-sm-4 col-md-4 col-lg-2 border border-warning">
       <img src="{path}" class="img-thumbnail rounded mt-2" />
       <p><center>{id}</center></p>
+      <p>{photoTypeSelect}</p>
       <a href="/admin?module=photos&flip={id}&direction=horizontal" class="btn btn-info btn-sm m-1">Flip ↔</a>
       <a href="/admin?module=photos&flip={id}&direction=vertical" class="btn btn-info btn-sm m-1">Flip ↕</a>
       <a href="/admin?module=photos&deleteID={id}" class="btn btn-danger btn-sm m-1">Delete</a>

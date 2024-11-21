@@ -48,7 +48,7 @@ class AdminServer {
             let template = BootstrapTemplate()
             template.title = "Admin"
             template.addCSS(url: "css/tagify.css")
-            template.addJS(url: "js/photoUpload.js?v=2")
+            template.addJS(url: "js/photoUpload.js?v=4")
             template.addJS(url: "js/tagify.js")
             
             func addFormJavaScript() throws {
@@ -117,6 +117,9 @@ class AdminServer {
                 module["form"] = Template.cached(relativePath: "templates/uploadForm.tpl.html")
                 let photos = try PhotoTable.get(db: db, last: 12)
                 module["amount"] = photos.count
+                for photoType in PhotoType.allCases {
+                    module.assign(["value": photoType.rawValue, "name": "\(photoType)"], inNest: "photoType")
+                }
                 assignThumbnails(photos, module, postID: 0)
             default:
                 module = Template.cached(relativePath: "templates/admin.welcome.tpl.html")
@@ -126,13 +129,37 @@ class AdminServer {
             template.body = adminTemplate
             return .ok(.html(template))
         }
+
         server.post["/admin/ajax_photo"] = { request, _ in
             guard let data = Data(base64Encoded: request.body.data) else {
                 return .badRequest(.text("wrong data"))
             }
             print("Received \(data)")
-            _ = try photoManager.store(picture: data)
+            var photoType = PhotoType.mainPhoto
+            if let typeID = request.queryParams.get("photoType")?.int,
+               let definedType = PhotoType(rawValue: typeID) {
+                photoType = definedType
+            }
+            _ = try photoManager.store(picture: data, photoType: photoType)
             return .ok(.text("OK"))
+        }
+
+        server.get["/admin/updatePhotoType.js"] = { request, _ in
+            guard let photoID = request.queryParams.get("updatePhotoID")?.int64,
+                  let typeID = request.queryParams.get("typeID")?.int,
+                  let photoType = PhotoType(rawValue: typeID) else {
+                return .ok(.js(JSCode.showError("Invalid query params")))
+            }
+            guard let photo = try photoManager.get(photoID: photoID) else {
+                return .ok(.js(JSCode.showError("Unknown photo with ID: \(photoID)")))
+            }
+            photo.photoType = photoType
+            try photoManager.update(photo: photo)
+            self.pageCache.invalidate(meta: CacheMetaData(postIDs: [],
+                                                          photoIDs: [photoID],
+                                                          tagIDs: [],
+                                                          isOnMainStory: false))
+            return .ok(.js(JSCode.showSuccess("Updated photo \(photoID) type to \(photoType)")))
         }
     }
     
@@ -142,7 +169,8 @@ class AdminServer {
             module.assign([
                 "path": "thumbs/" + photo.filename,
                 "id": photo.id!,
-                "postID": postID
+                "postID": postID,
+                "photoTypeSelect": EditPhotoTypeWidget.form(photo: photo)
             ], inNest: "pics")
         }
     }
@@ -214,7 +242,7 @@ class AdminServer {
     private func storePhotoIfNeeded(_ request: HttpRequest) {
         for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
             print("Received \(multiPart.body.count) bytes")
-            _ = try? photoManager.store(picture: Data(multiPart.body))
+            _ = try? photoManager.store(picture: Data(multiPart.body), photoType: .mainPhoto)
         }
     }
     

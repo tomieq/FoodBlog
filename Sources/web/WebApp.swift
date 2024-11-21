@@ -245,7 +245,10 @@ class WebApp {
         var visibleTagIDs: [Int64] = []
         for post in posts {
             previewTemplate.reset()
-            for photo in try photoManager.get(postID: post.id!).prefix(2) {
+            let mainPhotos = try photoManager.get(postID: post.id!)
+                .filter { $0.photoType == .mainPhoto }
+                .prefix(2)
+            for photo in mainPhotos {
                 previewTemplate.assign(["path": "/thumbs/\(photo.filename)"], inNest: "pic")
                 visiblePhotoIDs.append(photo.id!)
             }

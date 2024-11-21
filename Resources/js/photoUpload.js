@@ -3,6 +3,7 @@ function handleFiles()
     var dataurl = null;
     var filesToUpload = document.getElementById('photo').files;
     var file = filesToUpload[0];
+    var photoType = document.getElementById('photoType').value;
 
     // Create an image
     var img = document.createElement("img");
@@ -42,7 +43,7 @@ function handleFiles()
             dataurl = canvas.toDataURL("image/jpeg").slice(23);
 
             $.ajax({
-                url: '/admin/ajax_photo',
+                url: '/admin/ajax_photo?photoType=' + photoType,
                 data: dataurl,
                 cache: false,
                 contentType: false,
@@ -56,4 +57,10 @@ function handleFiles()
     }
     // Load files into file reader
     reader.readAsDataURL(file);
+}
+
+function updatePhotoType(photoID, select) {
+    $.getScript( "admin/updatePhotoType.js?updatePhotoID=" + photoID + "&typeID=" + select.value, function( data, textStatus, jqxhr ) {
+      console.log( "Load was performed." );
+    });
 }

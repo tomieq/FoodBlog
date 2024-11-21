@@ -32,12 +32,13 @@ struct PhotoManager {
         try PhotoTable.create(db: db)
     }
     
-    func store(picture: Data) throws -> Photo {
+    func store(picture: Data, photoType: PhotoType) throws -> Photo {
         let image = try Image(data: picture, as: .jpg)
         let name = Photo.randomName
         let photo = Photo(id: nil,
                           postID: 0,
-                          filename: name)
+                          filename: name,
+                          photoType: photoType)
         try PhotoTable.store(db: db, photo)
 
         if image.size.width > 2048 {
@@ -52,8 +53,16 @@ struct PhotoManager {
         return photo
     }
     
+    func update(photo: Photo) throws {
+        try PhotoTable.store(db: db, photo)
+    }
+    
     func get(postID: Int64) throws -> [Photo] {
         try PhotoTable.get(db: db, postID: postID)
+    }
+    
+    func get(photoID: Int64) throws -> Photo? {
+        try PhotoTable.get(db: db, id: photoID)
     }
     
     func remove(photoID: Int64) throws -> Photo? {

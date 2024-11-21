@@ -12,6 +12,7 @@ enum PhotoTable {
     static let postID = Expression<Int64>("postID")
     static let filename = Expression<String>("filename")
     static let sequence = Expression<Int>("sequence")
+    static let photoType = SQLite.Expression<Int>("type")
 }
 
 extension PhotoTable {
@@ -30,6 +31,8 @@ extension PhotoTable {
             db.userVersion = 1
             print("Migrated DB to version 1")
         }
+        _ = try? db.run(table.addColumn(photoType, defaultValue: PhotoType.mainPhoto.rawValue))
+        try db.run(table.createIndex(photoType, ifNotExists: true))
     }
     
     static func store(db: Connection, _ photo: Photo) throws {
@@ -37,14 +40,16 @@ extension PhotoTable {
             try db.run(table.filter(id == rowID).update(
                 postID <- photo.postID,
                 filename <- photo.filename,
-                sequence <- photo.sequence
+                sequence <- photo.sequence,
+                photoType <- photo.photoType.rawValue
             ))
             print("Updated \(photo.json)")
         } else {
             let id = try db.run(table.insert(
                 postID <- photo.postID,
                 filename <- photo.filename,
-                sequence <- photo.sequence
+                sequence <- photo.sequence,
+                photoType <- photo.photoType.rawValue
             ))
             photo.id = id
             print("Inserted \(photo.json)")
@@ -57,6 +62,7 @@ extension PhotoTable {
             result.append(Photo(id: row[id],
                                 postID: row[Self.postID],
                                 filename: row[filename],
+                                photoType: PhotoType(rawValue: row[photoType]) ?? .mainPhoto,
                                 sequence: row[sequence]))
         }
         return result
@@ -67,6 +73,7 @@ extension PhotoTable {
             return Photo(id: row[Self.id],
                          postID: row[Self.postID],
                          filename: row[Self.filename],
+                         photoType: PhotoType(rawValue: row[photoType]) ?? .mainPhoto,
                          sequence: row[sequence])
         }
         return nil
@@ -78,6 +85,7 @@ extension PhotoTable {
             result.append(Photo(id: row[id],
                                 postID: row[Self.postID],
                                 filename: row[filename],
+                                photoType: PhotoType(rawValue: row[photoType]) ?? .mainPhoto,
                                 sequence: row[sequence]))
         }
         return result
@@ -89,6 +97,7 @@ extension PhotoTable {
             result.append(Photo(id: row[id],
                                 postID: row[Self.postID],
                                 filename: row[filename],
+                                photoType: PhotoType(rawValue: row[photoType]) ?? .mainPhoto,
                                 sequence: row[sequence]))
         }
         return result
