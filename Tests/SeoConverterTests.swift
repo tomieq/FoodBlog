@@ -12,11 +12,11 @@ import Foundation
 
 struct SeoConverterTests {
     @Test func check() async throws {
-        #expect("ćma".seo == "cma")
-        #expect("Łódź".seo == "Lodz")
-        #expect("ta Łódź".seo == "taLodz")
-        #expect("Ta Łódź".seo == "TaLodz")
-        #expect("the camel".seo == "theCamel")
-        #expect("".seo == "")
+        #expect("ćma".camelCase == "cma")
+        #expect("Łódź".camelCase == "Lodz")
+        #expect("ta Łódź".camelCase == "taLodz")
+        #expect("Ta Łódź".camelCase == "TaLodz")
+        #expect("the camel".camelCase == "theCamel")
+        #expect("".camelCase == "")
     }
 }

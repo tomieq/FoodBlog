@@ -23,7 +23,7 @@ class TagManager {
         let existingTagNames = tags.map{ $0.name }
         for name in names {
             if existingTagNames.contains(name).not {
-                let tag = Tag(name: name, seoName: name.seo, tagType: .standard)
+                let tag = Tag(name: name, seoName: name.camelCase, tagType: .standard)
                 try TagTable.store(db: db, tag)
                 tags.append(tag)
                 changedTagIDs.append(tag.id!)
@@ -66,7 +66,7 @@ class TagManager {
         }
         let tag = Tag(id: currentTag.id,
                       name: updatedTag.name,
-                      seoName: updatedTag.name.seo,
+                      seoName: updatedTag.name.camelCase,
                       tagType: updatedTag.tagType)
         try TagTable.store(db: db, tag)
         return tag.id

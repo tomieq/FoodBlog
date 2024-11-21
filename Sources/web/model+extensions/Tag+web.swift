@@ -33,3 +33,12 @@ extension Tag {
         }
     }
 }
+
+extension Tag {
+    var webLink: String {
+        "/tag/\(self.seoName)"
+    }
+    func webLinkPaged(_ page: Int) -> String {
+        "/tag/\(self.seoName)/\(page)"
+    }
+}
