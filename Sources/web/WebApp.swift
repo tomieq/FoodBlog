@@ -143,7 +143,7 @@ class WebApp {
     }
     
     func start() throws {
-        try server.start(8081)
+        try server.start(8080)
     }
     
     private func pagedMainPostList(page: Int, path: String) throws -> CustomStringConvertible {
