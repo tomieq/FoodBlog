@@ -79,22 +79,49 @@ class WebApp {
         }
         // paged history of posts
         server.get["/strona/:page"] = { [unowned self] request, headers in
-            let page = request.pathParams.get("page")?.int ?? 0
+            if let cached = pageCache.page(request.path) {
+                return .ok(.html(cached))
+            }
+            let page = request.pathParams.get("page")?
+                .replacingOccurrences(of: ".html", with: "").int ?? 0
+            if request.path != Timeline.webLinkPaged(page) {
+                return .movedPermanently(Timeline.webLinkPaged(page))
+            }
             return .ok(.html(try pagedMainPostList(page: page, path: request.path)))
         }
+        // legacy tag/seoName
         server.get["/tag/:seoName"] = { [unowned self] request, headers in
             guard let seoName = request.pathParams.get("seoName"),
                   let tag = try tagManager.get(seoName: seoName) else {
                 return .notFound()
             }
-            return .ok(.html(try pagedTagPostList(tag: tag, page: 0, path: request.path)))
+            return .movedPermanently(tag.webLink)
         }
+        // legacy tag/seoName/page
         server["/tag/:seoName/:page"] = { [unowned self] request, headers in
             guard let seoName = request.pathParams.get("seoName"),
                   let tag = try tagManager.get(seoName: seoName) else {
                 return .notFound()
             }
             let page = request.pathParams.get("page")?.int ?? 0
+            return .movedPermanently(tag.webLinkPaged(page))
+        }
+        server.get["/tagi/:seoName"] = { [unowned self] request, headers in
+            if let cached = pageCache.page(request.path) {
+                return .ok(.html(cached))
+            }
+            guard var seoName = request.pathParams.get("seoName")?.replacingOccurrences(of: ".html", with: "") else {
+                return .notFound()
+            }
+            var page = 0
+            if seoName.contains("-") {
+                let parts = seoName.components(separatedBy: "-")
+                page = parts.last?.int ?? 0
+                seoName = parts.first ?? seoName
+            }
+            guard let tag = try tagManager.get(seoName: seoName) else {
+                return .notFound()
+            }
             return .ok(.html(try pagedTagPostList(tag: tag, page: page, path: request.path)))
         }
         server["/index.html"] = { _, _ in
@@ -120,18 +147,15 @@ class WebApp {
     }
     
     private func pagedMainPostList(page: Int, path: String) throws -> CustomStringConvertible {
-        if let cached = pageCache.page(path) {
-            return cached
-        }
         let amount = try postManager.amount()
         let posts = try postManager.list(limit: postsPerPage, page: page)
         var previousPath: String? = nil
         var nextPath: String? = nil
         if page > 0 {
-            previousPath = page == 1 ? "/" : "/strona/\(page - 1)"
+            previousPath = Timeline.webLinkPaged(page - 1)
         }
         if (page + 1) * postsPerPage < amount {
-            nextPath = "/strona/\(page + 1)"
+            nextPath = Timeline.webLinkPaged(page + 1)
         }
 
         return try previewListResponse(posts: posts,
@@ -143,9 +167,6 @@ class WebApp {
     }
     
     private func pagedTagPostList(tag: Tag, page: Int, path: String) throws -> CustomStringConvertible {
-        if let cached = pageCache.page(path) {
-            return cached
-        }
         let postIDs = try tagManager.getPostIDs(tagID: tag.id!)
         let posts = try postManager.list(ids: postIDs, limit: postsPerPage, page: page)
         var previousPath: String? = nil

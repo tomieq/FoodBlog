@@ -36,9 +36,9 @@ extension Tag {
 
 extension Tag {
     var webLink: String {
-        "/tag/\(self.seoName)"
+        "/tagi/\(self.seoName).html"
     }
     func webLinkPaged(_ page: Int) -> String {
-        "/tag/\(self.seoName)/\(page)"
+        "/tagi/\(self.seoName)-\(page).html"
     }
 }
