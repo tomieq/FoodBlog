@@ -30,7 +30,7 @@ class PostSummaryWidget {
         }
         let meals = tags.filter{ $0.tagType == .mealName }
             //.map { $0.name }
-            .map { "<a href=\"\($0.webLink)\" class=\"btn btn-sm btn-tag-\($0.tagType)\">\($0.name)</a>" }
+            .map { "<a href=\"\($0.webLink)\" class=\"btn btn-sm btn-tag-\($0.tagType) mb-1\">\($0.nameEaten)</a>" }
         if meals.isEmpty {
             txt.append(" bardzo ciekawe pozycje")
         } else if meals.count == 1 {

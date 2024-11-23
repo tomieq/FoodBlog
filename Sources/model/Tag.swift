@@ -16,13 +16,16 @@ class Tag: Codable {
     let name: String
     let seoName: String
     let tagType: TagType
+    let nameEaten: String
     
     init(id: Int64? = nil,
          name: String,
+         nameEaten: String,
          seoName: String,
          tagType: TagType) {
         self.id = id
         self.name = name
+        self.nameEaten = nameEaten
         self.seoName = seoName
         self.tagType = tagType
     }
