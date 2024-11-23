@@ -97,7 +97,9 @@ struct PostManagerTests {
     }
 
     func createPhoto() throws -> Photo {
-        let photo = Photo(postID: 0, filename: UUID().uuidString + ".jpg")
+        let photo = Photo(postID: 0, 
+                          filename: UUID().uuidString + ".jpg",
+                          photoType: .mainPhoto)
         try PhotoTable.store(db: connection, photo)
         return photo
     }

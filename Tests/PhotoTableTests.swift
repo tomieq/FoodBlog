@@ -16,11 +16,13 @@ struct PhotoTableTests {
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: nil,
                                        postID: 70,
-                                       filename: "temp.jpg"))
+                                       filename: "temp.jpg",
+                                       photoType: .mainPhoto))
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: nil,
                                        postID: 71,
-                                       filename: "temp3.jpg"))
+                                       filename: "temp3.jpg",
+                                       photoType: .mainPhoto))
         let saved = try PhotoTable.get(db: connection, postID: 70)
         #expect(saved.count == 1)
         #expect(saved.first?.filename == "temp.jpg")
@@ -32,12 +34,14 @@ struct PhotoTableTests {
         try PhotoTable.create(db: connection)
         let photo = Photo(id: nil,
                           postID: 70,
-                          filename: "temp.jpg")
+                          filename: "temp.jpg",
+                          photoType: .mainPhoto)
         try PhotoTable.store(db: connection, photo)
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: photo.id,
                                        postID: 70,
-                                       filename: "temp3.jpg"))
+                                       filename: "temp3.jpg",
+                                       photoType: .mainPhoto))
         let saved = try PhotoTable.get(db: connection, postID: 70)
         #expect(saved.count == 1)
         #expect(saved.first?.filename == "temp3.jpg")
@@ -49,7 +53,8 @@ struct PhotoTableTests {
         try PhotoTable.create(db: connection)
         let photo = Photo(id: nil,
                           postID: 70,
-                          filename: "temp.jpg")
+                          filename: "temp.jpg",
+                          photoType: .mainPhoto)
         try PhotoTable.store(db: connection, photo)
 
         let saved = try PhotoTable.get(db: connection, id: photo.id!)
@@ -62,7 +67,8 @@ struct PhotoTableTests {
         try PhotoTable.create(db: connection)
         let photo = Photo(id: nil,
                           postID: 70,
-                          filename: "temp.jpg")
+                          filename: "temp.jpg",
+                          photoType: .mainPhoto)
         try PhotoTable.store(db: connection, photo)
         try PhotoTable.store(db: connection, photo)
 
@@ -76,11 +82,13 @@ struct PhotoTableTests {
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: nil,
                                        postID: 0,
-                                       filename: "temp.jpg"))
+                                       filename: "temp.jpg",
+                                       photoType: .mainPhoto))
         _ = try PhotoTable.store(db: connection,
                                  Photo(id: nil,
                                        postID: 0,
-                                       filename: "temp3.jpg"))
+                                       filename: "temp3.jpg",
+                                       photoType: .mainPhoto))
         var saved = try PhotoTable.unowned(db: connection)
         #expect(saved.count == 2)
         try PhotoTable.remove(db: connection, id: 1)
