@@ -208,6 +208,16 @@ class WebApp {
         let postTags = try tagManager.getTags(postID: post.id!)
         visibleTagIDs.append(contentsOf: postTags.compactMap{ $0.id })
         
+        let summaryWidget = PostSummaryWidget(post: post, tags: postTags, summaryType: .text)
+        responseTemplate.addMeta(name: "keywords",
+                                 value: postTags.map{ $0.name }
+            .joined(separator: ", ")
+            .replacingOccurrences(of: "\"", with: ""))
+        responseTemplate.addMeta(name: "description",
+                                 value: summaryWidget.summary
+            .replacingOccurrences(of: "\"", with: ""))
+        
+        
         let tagWidget = TagWidget()
         postTemplate["tags"] = tagWidget.html(tags: postTags)
     
@@ -254,7 +264,7 @@ class WebApp {
             }
             let tags = try tagManager.getTags(postID: post.id!)
             visibleTagIDs.append(contentsOf: tags.compactMap{ $0.id })
-            let previewText = PostSummaryWidget(post: post, tags: tags)
+            let previewText = PostSummaryWidget(post: post, tags: tags, summaryType: .html)
             previewTemplate["title"] = post.title
             previewTemplate["text"] = previewText.summary
             previewTemplate["postLink"] = post.webLink

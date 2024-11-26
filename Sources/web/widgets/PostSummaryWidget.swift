@@ -6,13 +6,20 @@
 //
 import Foundation
 
+enum SummaryType {
+    case html
+    case text
+}
+
 class PostSummaryWidget {
     let post: Post
     let tags: [Tag]
+    let summaryType: SummaryType
     
-    init(post: Post, tags: [Tag]) {
+    init(post: Post, tags: [Tag], summaryType: SummaryType) {
         self.post = post
         self.tags = tags
+        self.summaryType = summaryType
     }
     
     var summary: String {
@@ -30,7 +37,14 @@ class PostSummaryWidget {
         }
         let meals = tags.filter{ $0.tagType == .mealName }
             //.map { $0.name }
-            .map { "<a href=\"\($0.webLink)\" class=\"btn btn-sm btn-tag-\($0.tagType) mb-1\">\($0.nameEaten)</a>" }
+            .map {
+                switch summaryType {
+                case .html:
+                    "<a href=\"\($0.webLink)\" class=\"btn btn-sm btn-tag-\($0.tagType)\">\($0.nameEaten)</a>"
+                case .text:
+                    $0.nameEaten
+                }
+            }
         if meals.isEmpty {
             txt.append(" bardzo ciekawe pozycje")
         } else if meals.count == 1 {
