@@ -38,6 +38,10 @@ h2, h3, h4 {
     font-family: "Open Sans", sans-serif;
 }
 
+.logo {
+    max-width: 50%;
+}
+
 .heading_container {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -153,6 +157,10 @@ a:focus {
 
 .navbar-brand {
   font-family: 'Verdana', cursive;
+}
+
+.navbar a {
+    width: 100%;
 }
 
 .navbar-brand span {
@@ -293,6 +301,13 @@ a:focus {
   margin-bottom: 15px;
 }
 
+.detail-box h1 {
+    text-shadow: 4px 4px 6px rgb(0 0 0 / 0.9);
+}
+
+.detail-box h3 {
+    text-shadow: 4px 4px 6px rgb(0 0 0 / 0.9);
+}
 .slider_section .detail-box p {
   font-size: 14px;
 }

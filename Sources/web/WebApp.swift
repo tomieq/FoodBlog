@@ -28,7 +28,7 @@ class WebApp {
     
     var responseTemplate: BootstrapTemplate {
         let template = BootstrapTemplate()
-        template.addCSS(url: "/css/style.css?v=2.8")
+        template.addCSS(url: "/css/style.css?v=2.9")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
