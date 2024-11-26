@@ -28,7 +28,7 @@ class WebApp {
     
     var responseTemplate: BootstrapTemplate {
         let template = BootstrapTemplate()
-        template.addCSS(url: "/css/style.css?v=2.9")
+        template.addCSS(url: "/css/style.css?v=2.10")
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
@@ -223,6 +223,9 @@ class WebApp {
     
         if let price = post.mealPrice {
             postTemplate["mealPrice"] = "\(price.price) PLN"
+        }
+        if let mealQuality = post.mealQuality {
+            postTemplate["mealQuality"] = "Ogólna ocenia dania: <span class=\"red-text\">\(mealQuality.readable)</span>"
         }
         body["content"] = postTemplate
         let restaurantName = postTags.first{ $0.tagType == .restaurantName }.map{ $0.name } ?? ""

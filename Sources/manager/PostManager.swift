@@ -19,11 +19,13 @@ struct PostManager {
                text: String,
                date: Date,
                photoIDs: [Int64],
-               mealPrice: Double?) throws -> Post {
+               mealPrice: Double?,
+               mealQuality: MealQuality?) throws -> Post {
         let post = Post(title: title,
                         text: text,
                         date: date,
-                        mealPrice: mealPrice)
+                        mealPrice: mealPrice,
+                        mealQuality: mealQuality)
         try PostTable.store(db: db, post)
         for photo in try PhotoTable.get(db: db, ids: photoIDs) {
             photo.postID = post.id!
@@ -38,12 +40,14 @@ struct PostManager {
                 text: String,
                 date: Date,
                 photoIDs: [Int64],
-                mealPrice: Double?) throws -> Post {
+                mealPrice: Double?,
+                mealQuality: MealQuality?) throws -> Post {
         let updatedPost = Post(id: post.id,
                                title: title,
                                text: text,
                                date: date,
-                               mealPrice: mealPrice)
+                               mealPrice: mealPrice,
+                               mealQuality: mealQuality)
         try PostTable.store(db: db, updatedPost)
         // unassign
         for photo in try PhotoTable.get(db: db, postID: post.id!) where photoIDs.contains(photo.id!).not {

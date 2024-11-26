@@ -484,6 +484,10 @@ a {
     color: #EBE08C;
 }
 
+.red-text {
+    color: #A52A2A;
+}
+
 .btn-tag-restaurantName, .btn-tag-restaurantName:hover, .btn-tag-restaurantName:active, .btn-tag-restaurantName:visited {
     background-color: #ECDF8C !important;
     color: #0E0E0E;

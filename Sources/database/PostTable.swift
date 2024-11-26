@@ -15,6 +15,7 @@ enum PostTable {
     static let text = SQLite.Expression<String>("text")
     static let date = SQLite.Expression<Double>("date")
     static let mealPrice = SQLite.Expression<Double?>("mealPrice")
+    static let mealQuality = SQLite.Expression<Int?>("mealQuality")
 }
 
 extension PostTable {
@@ -27,6 +28,14 @@ extension PostTable {
         })
         try db.run(table.createIndex(date, ifNotExists: true))
         _ = try? db.run(table.addColumn(mealPrice, defaultValue: nil))
+        _ = try? db.run(table.addColumn(mealQuality, defaultValue: nil))
+    }
+    
+    private static func mealQuality(from row: Row) -> MealQuality? {
+        guard let rawValue = row[Self.mealQuality] else {
+            return nil
+        }
+        return MealQuality(rawValue: rawValue)
     }
     
     static func store(db: Connection, _ post: Post) throws {
@@ -35,7 +44,8 @@ extension PostTable {
                 title <- post.title,
                 text <- post.text,
                 date <- post.date.timeIntervalSince1970,
-                mealPrice <- post.mealPrice
+                mealPrice <- post.mealPrice,
+                mealQuality <- post.mealQuality?.rawValue
             ))
             print("Updated \(post.json)")
         } else {
@@ -43,7 +53,8 @@ extension PostTable {
                 title <- post.title,
                 text <- post.text,
                 date <- post.date.timeIntervalSince1970,
-                mealPrice <- post.mealPrice
+                mealPrice <- post.mealPrice,
+                mealQuality <- post.mealQuality?.rawValue
             ))
             post.id = id
             print("Inserted \(post.json)")
@@ -60,7 +71,8 @@ extension PostTable {
                         title: row[Self.title],
                         text: row[Self.text],
                         date: Date(timeIntervalSince1970: row[Self.date]),
-                        mealPrice: row[Self.mealPrice])
+                        mealPrice: row[Self.mealPrice],
+                        mealQuality: Self.mealQuality(from: row))
         }
         return nil
     }
@@ -72,7 +84,8 @@ extension PostTable {
                                title: row[Self.title],
                                text: row[Self.text],
                                date: Date(timeIntervalSince1970: row[Self.date]),
-                               mealPrice: row[Self.mealPrice]))
+                               mealPrice: row[Self.mealPrice],
+                               mealQuality: Self.mealQuality(from: row)))
         }
         return result
     }
@@ -84,7 +97,8 @@ extension PostTable {
                                title: row[Self.title],
                                text: row[Self.text],
                                date: Date(timeIntervalSince1970: row[Self.date]),
-                               mealPrice: row[Self.mealPrice]))
+                               mealPrice: row[Self.mealPrice],
+                               mealQuality: Self.mealQuality(from: row)))
         }
         return result
     }

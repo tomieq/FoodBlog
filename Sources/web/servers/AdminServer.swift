@@ -193,7 +193,8 @@ class AdminServer {
         if let title = request.formData.get("title"), let text = request.formData.get("text"),
            !text.isEmpty, !title.isEmpty, let tagList = request.formData.get("tags")?.split(separator: ","),
            let ids = request.formData.get("pictureIDs"), let dateString = request.formData.get("date"),
-           let date = Date.make(from: dateString), let priceText = request.formData.get("price") {
+           let date = Date.make(from: dateString), let priceText = request.formData.get("price"),
+           let mealQualityRaw = request.formData.get("mealQuality")?.int {
             let photoIDs = ids.components(separatedBy: ",")
                 .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .compactMap { Int64($0)}
@@ -201,10 +202,22 @@ class AdminServer {
             var updatedPost: Post!
             var isOnMainStory = false
             let price: Double? = priceText.isEmpty ? nil : Double(priceText)
+            let mealQuality = MealQuality(rawValue: mealQualityRaw)
             if let postID = request.formData.get("postID"), let id = Int64(postID), let post = try postManager.get(id: id) {
-                updatedPost = try postManager.update(post, title: title, text: text, date: date, photoIDs: photoIDs, mealPrice: price)
+                updatedPost = try postManager.update(post,
+                                                     title: title,
+                                                     text: text,
+                                                     date: date,
+                                                     photoIDs: photoIDs,
+                                                     mealPrice: price,
+                                                     mealQuality: mealQuality)
             } else {
-                updatedPost =  try postManager.store(title: title, text: text, date: date, photoIDs: photoIDs, mealPrice: price)
+                updatedPost =  try postManager.store(title: title,
+                                                     text: text,
+                                                     date: date,
+                                                     photoIDs: photoIDs,
+                                                     mealPrice: price,
+                                                     mealQuality: mealQuality)
                 isOnMainStory = true
             }
             let tagNames = tagList.map { "\($0)".trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -275,6 +288,10 @@ class AdminServer {
         form.addInputText(name: "title", label: "Tytuł posta", value: post.title)
         form.addTextarea(name: "text", label: "Treść", rows: 10, value: post.text)
         form.addInputText(name: "price", label: "Cena", value: post.mealPrice?.price ?? "")
+        form.addRadio(name: "mealQuality",
+                      label: "Ocena posiłku",
+                      options: MealQuality.allCases.map{ FormRadioModel(label: $0.readable, value: "\($0.rawValue)") },
+                      checked: post.mealQuality?.rawValue.description)
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
         let tags = try tagManager.getTags(postID: post.id!)
         form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
@@ -293,6 +310,9 @@ class AdminServer {
         form.addInputText(name: "title", label: "Tytuł posta")
         form.addTextarea(name: "text", label: "Treść", rows: 10)
         form.addInputText(name: "price", label: "Cena", value: "")
+        form.addRadio(name: "mealQuality",
+                      label: "Ocena posiłku",
+                      options: MealQuality.allCases.map{ FormRadioModel(label: $0.readable, value: "\($0.rawValue)") })
         form.addInputText(name: "date", label: "Data", value: Date().readable)
         form.addInputText(name: "tags", label: "Tagi", value: "")
         form.addSubmit(name: "add", label: "Opublikuj", style: .success)

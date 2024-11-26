@@ -55,6 +55,9 @@ class PostSummaryWidget {
             txt.append(mealList.joined(separator: ", ") + " oraz " + lastMeal)
         }
         txt.append(".")
+        if let mealQuality = post.mealQuality {
+            txt.append(" Danie było \(mealQuality.readable).")
+        }
         return txt
     }
 }
