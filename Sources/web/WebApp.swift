@@ -225,6 +225,8 @@ class WebApp {
             postTemplate["mealPrice"] = "\(price.price) PLN"
         }
         body["content"] = postTemplate
+        let restaurantName = postTags.first{ $0.tagType == .restaurantName }.map{ $0.name } ?? ""
+        body["subtitle"] = "Relacja z wizyty w \(restaurantName) dnia \(post.date.readable)"
         
         responseTemplate.body = body
     
