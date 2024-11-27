@@ -288,10 +288,10 @@ class AdminServer {
         form.addInputText(name: "title", label: "Tytuł posta", value: post.title)
         form.addTextarea(name: "text", label: "Treść", rows: 10, value: post.text)
         form.addInputText(name: "price", label: "Cena", value: post.mealPrice?.price ?? "")
-        form.addRadio(name: "mealQuality",
+        form.addSelect(name: "mealQuality",
                       label: "Ocena posiłku",
-                      options: MealQuality.allCases.map{ FormRadioModel(label: $0.readable, value: "\($0.rawValue)") },
-                      checked: post.mealQuality?.rawValue.description)
+                      options: MealQuality.allCases.map{ FormSelectModel(label: $0.readable, value: $0.rawValue) },
+                      selected: post.mealQuality?.rawValue)
         form.addInputText(name: "date", label: "Data", value: post.date.readable)
         let tags = try tagManager.getTags(postID: post.id!)
         form.addInputText(name: "tags", label: "Tagi", value: tags.map { $0.name }.joined(separator: ","))
@@ -310,9 +310,9 @@ class AdminServer {
         form.addInputText(name: "title", label: "Tytuł posta")
         form.addTextarea(name: "text", label: "Treść", rows: 10)
         form.addInputText(name: "price", label: "Cena", value: "")
-        form.addRadio(name: "mealQuality",
+        form.addSelect(name: "mealQuality",
                       label: "Ocena posiłku",
-                      options: MealQuality.allCases.map{ FormRadioModel(label: $0.readable, value: "\($0.rawValue)") })
+                      options: MealQuality.allCases.map{ FormSelectModel(label: $0.readable, value: $0.rawValue) })
         form.addInputText(name: "date", label: "Data", value: Date().readable)
         form.addInputText(name: "tags", label: "Tagi", value: "")
         form.addSubmit(name: "add", label: "Opublikuj", style: .success)
@@ -323,7 +323,10 @@ class AdminServer {
         let form = Form(url: "/admin?module=tags", method: "POST")
         form.addInputText(name: "name", label: "Nazwa", value: tag.name)
         form.addInputText(name: "nameEaten", label: "Odmieniona nazwa", value: tag.nameEaten)
-        form.addRadio(name: "type", label: "Typ", options: TagType.allCases.map { FormRadioModel(label: "\($0)", value: "\($0.rawValue)") }, checked: "\(tag.tagType.rawValue)")
+        form.addRadio(name: "type",
+                      label: "Typ",
+                      options: TagType.allCases.map { FormRadioModel(label: "\($0)", value: $0.rawValue) },
+                      selected: tag.tagType.rawValue)
         form.addHidden(name: "seoName", value: tag.seoName)
         form.addSubmit(name: "add", label: "Aktualizuj", style: .success)
         return form
