@@ -32,6 +32,7 @@ class WebApp {
         template.addCSS(url: "/css/lightbox.min.css")
         template.addJS(url: "/js/lightbox.min.js")
         template.addJS(code: Template.cached(relativePath: "templates/securedRedirection.tpl.js"))
+        template.addFavicon(url: "/images/burger.png", type: "image/png")
         return template
     }
 
