@@ -17,7 +17,8 @@ struct PostTableTests {
                         title: "Nice title",
                         text: "Eating out is awesome!",
                         date: date,
-                        mealPrice: 32.0)
+                        mealPrice: 32.0,
+                        mealQuality: .average)
         try PostTable.create(db: connection)
         try PostTable.store(db: connection, post)
         let saved = try #require(try PostTable.get(db: connection, id: 1))

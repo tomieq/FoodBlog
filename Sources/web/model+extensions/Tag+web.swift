@@ -12,7 +12,7 @@ extension TagType {
             "#"
         case .restaurantName:
             "🏢"
-        case .mealName:
+        case .mainMeal, .mealSide, .mealSalad, .soup:
             "🍲"
         }
     }
@@ -28,7 +28,7 @@ extension Tag {
             "Jem na mieście"
         case .restaurantName:
             "Odwiedzone miejsce"
-        case .mealName:
+        case .mainMeal, .mealSide, .mealSalad, .soup:
             "Danie"
         }
     }

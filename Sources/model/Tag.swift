@@ -8,7 +8,10 @@
 enum TagType: Int, Codable, CaseIterable {
     case standard
     case restaurantName
-    case mealName
+    case mainMeal
+    case mealSide
+    case mealSalad
+    case soup
 }
 
 class Tag: Codable {

@@ -25,12 +25,12 @@ struct TagTableTests {
         let connection = try Connection(.inMemory)
         try TagTable.create(db: connection)
         _ = try TagTable.store(db: connection,
-                               Tag(name: "Łódź", nameEaten: "Łódź", seoName: "Lodz", tagType: .mealName))
+                               Tag(name: "Łódź", nameEaten: "Łódź", seoName: "Lodz", tagType: .mainMeal))
         _ = try TagTable.store(db: connection,
-                               Tag(name: "Warszawa", nameEaten: "Warszawa", seoName: "Warszawa", tagType: .mealName))
+                               Tag(name: "Warszawa", nameEaten: "Warszawa", seoName: "Warszawa", tagType: .mainMeal))
         let saved = try TagTable.get(db: connection, names: ["Łódź", "Warszawa"])
         #expect(saved.count == 2)
-        #expect(saved.first?.tagType == .mealName)
+        #expect(saved.first?.tagType == .mainMeal)
     }
 
 }

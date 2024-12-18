@@ -12,11 +12,11 @@ class TagWidget {
     func html(tags: [Tag]) -> String {
         var output: String = ""
         let places = tags.filter{ $0.tagType == .restaurantName }
-        let meals = tags.filter{ $0.tagType == .mealName }
+        let meals = tags.filter{ $0.tagType == .soup } + tags.filter{ $0.tagType == .mainMeal } + tags.filter{ $0.tagType == .mealSide } + tags.filter{ $0.tagType == .mealSalad }
         let other = tags.filter{ $0.tagType == .standard }
         
         output.append(addTags(places, with: "Miejsce \(TagType.restaurantName.icon)"))
-        output.append(addTags(meals, with: "Dania \(TagType.mealName.icon)"))
+        output.append(addTags(meals, with: "Dania \(TagType.mainMeal.icon)"))
         output.append(addTags(other, with: "Tagi"))
         
         return output

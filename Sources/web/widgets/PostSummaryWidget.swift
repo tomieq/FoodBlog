@@ -35,7 +35,9 @@ class PostSummaryWidget {
         } else {
             txt.append(" Zjadłem ")
         }
-        let meals = tags.filter{ $0.tagType == .mealName }
+
+        let meals = (tags.filter{ $0.tagType == .soup } + tags.filter{ $0.tagType == .mainMeal } +
+                     tags.filter{ $0.tagType == .mealSide } + tags.filter{ $0.tagType == .mealSalad })
             //.map { $0.name }
             .map {
                 switch summaryType {

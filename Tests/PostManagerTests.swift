@@ -29,7 +29,8 @@ struct PostManagerTests {
                                          text: "Awesome food!",
                                          date: Date(),
                                          photoIDs: photoIDs,
-                                         mealPrice: 29)
+                                         mealPrice: 29,
+                                         mealQuality: .average)
 
         for photo in try PhotoTable.get(db: connection, ids: photoIDs) {
             #expect(photo.postID == post.id)
@@ -42,7 +43,8 @@ struct PostManagerTests {
                                   text: "Awesome food!",
                                   date: Date(),
                                   photoIDs: [3, 1, 2],
-                                  mealPrice: 29)
+                                  mealPrice: 29,
+                                  mealQuality: .average)
 
         #expect(try PhotoTable.get(db: connection, id: 3)?.sequence == 0)
         #expect(try PhotoTable.get(db: connection, id: 1)?.sequence == 1)
@@ -55,7 +57,8 @@ struct PostManagerTests {
                                       text: "Content \(i)",
                                       date: Date(),
                                       photoIDs: [],
-                                      mealPrice: 29)
+                                      mealPrice: 29,
+                                      mealQuality: .average)
         }
         let page0 = try postManager.list(limit: 5, page: 0)
         #expect(page0.count == 5)
@@ -73,7 +76,8 @@ struct PostManagerTests {
                                   text: "Awesome food!",
                                   date: Date(),
                                   photoIDs: [3, 1, 2],
-                                  mealPrice: 29)
+                                  mealPrice: 29,
+                                  mealQuality: .average)
         _ = try tagManager.assignTagsToPost(names: ["Tasty", "cheap"], postID: 1)
         
         #expect(try PhotoTable.get(db: connection, postID: 1).count == 3)
@@ -91,7 +95,8 @@ struct PostManagerTests {
                                       text: "Content \(i)",
                                       date: Date(),
                                       photoIDs: [],
-                                      mealPrice: 29)
+                                      mealPrice: 29,
+                                      mealQuality: .average)
         }
         #expect(try postManager.amount() == 20)
     }

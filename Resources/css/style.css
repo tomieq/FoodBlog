@@ -488,12 +488,31 @@ a {
     color: #A52A2A;
 }
 
+.orange-text {
+    color: #FFA500;
+}
+
 .btn-tag-restaurantName, .btn-tag-restaurantName:hover, .btn-tag-restaurantName:active, .btn-tag-restaurantName:visited {
     background-color: #ECDF8C !important;
     color: #0E0E0E;
 }
 
-.btn-tag-mealName, .btn-tag-mealName:hover, .btn-tag-mealName:active, .btn-tag-mealName:visited {
+.btn-tag-mainMeal, .btn-tag-mainMeal:hover, .btn-tag-mainMeal:active, .btn-tag-mainMeal:visited {
+    background-color: #EB9100 !important;
+    color: #0E0E0E;
+}
+
+.btn-tag-mealSide, .btn-tag-mealSide:hover, .btn-tag-mealSide:active, .btn-tag-mealSide:visited {
+    background-color: #EB9100 !important;
+    color: #0E0E0E;
+}
+
+.btn-tag-mealSalad, .btn-tag-mealSalad:hover, .btn-tag-mealSalad:active, .btn-tag-mealSalad:visited {
+    background-color: #EB9100 !important;
+    color: #0E0E0E;
+}
+
+.btn-tag-soup, .btn-tag-soup:hover, .btn-tag-soup:active, .btn-tag-soup:visited {
     background-color: #EB9100 !important;
     color: #0E0E0E;
 }
