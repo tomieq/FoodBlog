@@ -34,18 +34,21 @@ class PageCache {
     }
     
     func invalidate(meta: CacheMetaData) {
-        dispatchQueue.sync(flags: .barrier) {
-            let pathsToInvalidate = metaData.filter { data in
+        _ = dispatchQueue.sync(flags: .barrier) {
+            metaData.filter { data in
                 data.value.postIDs.hasCommonElements(with: meta.postIDs) ||
                 data.value.photoIDs.hasCommonElements(with: meta.photoIDs) ||
                 data.value.tagIDs.hasCommonElements(with: meta.tagIDs) ||
                 (meta.isOnMainStory && data.value.isOnMainStory)
-            }.map { $0.key }
-            pathsToInvalidate.forEach { path in
-                cache[path] = nil
-                metaData[path] = nil
             }
-            print("Invalidated cache for \(pathsToInvalidate.count) entries: [\(pathsToInvalidate)]")
+            .map { $0.key }
+            .collect {
+                $0.forEach { path in
+                    cache[path] = nil
+                    metaData[path] = nil
+                }
+                print("Invalidated cache for \($0.count) entries: [\($0)]")
+            }
         }
     }
     

@@ -7,6 +7,6 @@
 
 extension Post {
     var webLink: String {
-        "/recenzje/\(self.id ?? 0)/\(self.title.seoLink)"
+        "/recenzje/\(self.id.or(0))/\(self.title.seoLink)"
     }
 }

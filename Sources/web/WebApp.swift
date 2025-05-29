@@ -46,6 +46,7 @@ class WebApp {
         print("Auth token: \(authToken)")
         print("Admin pass: \(adminPass)")
         server.name = "ChickenServer 2.3"
+        server.requestBodyLimit = .limit(.MB(15))
         staticServer = StaticFilesServer(server: server)
         adminServer = try AdminServer(server: server,
                                       db: db,
@@ -111,7 +112,7 @@ class WebApp {
             if let cached = pageCache.page(request.path) {
                 return .ok(.html(cached))
             }
-            guard var seoName = request.pathParams.get("seoName")?.replacingOccurrences(of: ".html", with: "") else {
+            guard var seoName = request.pathParams.get("seoName")?.removed(text: ".html") else {
                 return .notFound()
             }
             var page = 0
@@ -129,16 +130,16 @@ class WebApp {
             .movedPermanently("/")
         }
         server.middleware.append( { request, header in
-            let ip = request.headers.get("x-forwarded-for") ?? request.peerName ?? ""
+            let ip = request.headers.get("x-forwarded-for") ?? request.clientIP ?? ""
             let method = request.method.rawValue
             let path = request.path
-            let agent = request.headers.get("user-agent") ?? ""
-            let referer = request.headers.get("referer") ?? ""
+            let agent = request.headers.get("user-agent").or("")
+            let referer = request.headers.get("referer").or("")
             
-            request.onFinished = { summary in
+            request.onFinished( { summary in
                 // awstat format: %host %time2 %method %url %uaquot %code %bytesd %refererquot
-                FileLogger.shared.log("\(ip) \(Date().log) \(method) \(path) \"\(agent)\" \(summary.responseCode) \(summary.responseSizeInBytes) \"\(referer)\"\n")
-            }
+                FileLogger.shared.log("\(ip) \(Date().log) \(method) \(path) \"\(agent)\" \(summary.responseCode) \(summary.responseSize.count) \"\(referer)\"\n")
+            })
             return nil
         })
     }

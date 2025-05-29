@@ -6,10 +6,11 @@ import PackageDescription
 let package = Package(
     name: "FoodBlog",
     dependencies: [
-        .package(url: "https://github.com/tomieq/BootstrapStarter", revision: "d475bb2"),
-        .package(url: "https://github.com/tomieq/swifter", branch: "develop"),
+        .package(url: "https://github.com/tomieq/BootstrapStarter", branch: "master"),
+        .package(url: "https://github.com/tomieq/swifter", from: "3.1.0"),
         .package(url: "https://github.com/tomieq/Template.swift.git", from: "1.5.0"),
         .package(url: "https://github.com/twostraws/SwiftGD", branch: "main"),
+        .package(url: "https://github.com/tomieq/SwiftExtensions", branch: "master"),
         .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.15.3")
     ],
     targets: [
@@ -20,6 +21,7 @@ let package = Package(
                 .product(name: "Swifter", package: "Swifter"),
                 .product(name: "Template", package: "Template.swift"),
                 .product(name: "SwiftGD", package: "SwiftGD"),
+                .product(name: "SwiftExtensions", package: "SwiftExtensions"),
                 .product(name: "SQLite", package: "SQLite.swift")
             ]),
         .testTarget(

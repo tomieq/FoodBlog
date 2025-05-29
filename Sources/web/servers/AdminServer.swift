@@ -44,7 +44,7 @@ class AdminServer {
                 _ = try digest.authorizedUser(request)
                 headers.setCookie(name: "sid", value: authToken, path: "/", cache: .days(7))
             }
-            let moduleName = request.queryParams.get("module") ?? "welcome"
+            let moduleName = request.queryParams.get("module").or("welcome")
             let template = BootstrapTemplate()
             template.title = "Admin"
             template.addCSS(url: "css/tagify.css")
@@ -193,7 +193,7 @@ class AdminServer {
         if let title = request.formData.get("title"), let text = request.formData.get("text"),
            !text.isEmpty, !title.isEmpty, let tagList = request.formData.get("tags")?.split(separator: ","),
            let ids = request.formData.get("pictureIDs"), let dateString = request.formData.get("date"),
-           let date = Date.make(from: dateString), let priceText = request.formData.get("price"),
+           let date = Date.make(from: dateString), let priceText = request.formData.get("price")?.replacingOccurrences(of: ",", with: "."),
            let mealQualityRaw = request.formData.get("mealQuality")?.int {
             let photoIDs = ids.components(separatedBy: ",")
                 .map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -254,7 +254,7 @@ class AdminServer {
     }
     
     private func storePhotoIfNeeded(_ request: HttpRequest) {
-        for multiPart in request.parseMultiPartFormData() where multiPart.fileName != nil {
+        for multiPart in request.multiPart where multiPart.fileName != nil {
             print("Received \(multiPart.body.count) bytes")
             _ = try? photoManager.store(picture: Data(multiPart.body), photoType: .mainPhoto)
         }

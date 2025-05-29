@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftExtensions
 
 extension Array where Element: Equatable {
     var unique: [Element] {
@@ -19,11 +20,8 @@ extension Array where Element: Equatable {
 }
 
 extension Array where Element: Hashable {
-    func commonElements(with other: [Element]) -> [Element] {
-        Array(Set(self).intersection(Set(other)))
-    }
 
     func hasCommonElements(with other: [Element]) -> Bool {
-        !Set(self).intersection(Set(other)).isEmpty
+        self.commonElements(with: other).isEmpty.not
     }
 }

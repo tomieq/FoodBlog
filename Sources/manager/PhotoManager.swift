@@ -40,16 +40,23 @@ struct PhotoManager {
                           filename: name,
                           photoType: photoType)
         try PhotoTable.store(db: db, photo)
-
-        if image.size.width > 2048 {
-            try image.resizedTo(width: 2048)?.export(as: .jpg(quality: 80)).write(to: photo.piclocation)
-            print("Saved new file to \(photo.piclocation)")
-        } else {
-            try image.export(as: .jpg(quality: 80)).write(to: photo.piclocation)
-            print("Saved new file to \(photo.piclocation)")
-        }
-        try image.resizedTo(width: 256)?.export(as: .jpg(quality: 90)).write(to: photo.thumblocation)
-        print("Saved new file to \(photo.thumblocation)")
+        
+        try image.size.width.above(2048)
+            .onTrue {
+                try image.resizedTo(width: 2048)?
+                    .export(as: .jpg(quality: 80))
+                    .write(to: photo.piclocation)
+                print("Saved new file to \(photo.piclocation)")
+            }.onFalse {
+                try image.export(as: .jpg(quality: 80))
+                    .write(to: photo.piclocation)
+                print("Saved new file to \(photo.piclocation)")
+            }.always {
+                try image.resizedTo(width: 256)?
+                    .export(as: .jpg(quality: 90))
+                    .write(to: photo.thumblocation)
+                print("Saved new file to \(photo.thumblocation)")
+            }
         return photo
     }
     
