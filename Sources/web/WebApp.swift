@@ -8,6 +8,7 @@
 import Foundation
 import Swifter
 import SQLite
+import Env
 import BootstrapTemplate
 import Template
 import Dispatch
@@ -18,8 +19,8 @@ class WebApp {
     let postManager: PostManager
     let photoManager: PhotoManager
     let tagManager: TagManager
-    let authToken = ProcessInfo.processInfo.environment["auth_token"] ?? UUID().uuidString
-    let adminPass = ProcessInfo.processInfo.environment["admin_pass"] ?? UUID().uuidString
+    let authToken: String
+    let adminPass: String
     var pageCache = PageCache()
     let staticServer: StaticFilesServer
     let adminServer: AdminServer
@@ -38,6 +39,9 @@ class WebApp {
 
     init(db: Connection) throws {
         
+        let env = Env()
+        self.authToken = env.get("auth_token").or(UUID().uuidString)
+        self.adminPass = env.get("admin_pass").or(UUID().uuidString)
         self.db = db
         self.postManager = try PostManager(db: db)
         self.photoManager = try PhotoManager(db: db)

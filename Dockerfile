@@ -24,4 +24,5 @@ RUN rm -rf ./tmp
 
 COPY --from=builder /app/output/FoodBlog App
 COPY Resources /app/Resources
+COPY .env /app/.env
 CMD ["./App"]
